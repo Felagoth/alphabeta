@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "types.h"
 
-int *eval_game_ended(PositionList *board_history);
+bool eval_game_ended(PositionList *board_history, int *result);
 int eval(PositionList *board_history);
 
 #endif

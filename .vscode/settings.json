@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "uictypes.h": "c"
+        "uictypes.h": "c",
+        "functional": "c"
     }
 }

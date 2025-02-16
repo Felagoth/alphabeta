@@ -290,6 +290,14 @@ BoardState *move_piece_forced(BoardState *board_s, Move cur_move)
 {
     Coords init_coords = cur_move.init_co;
     Coords new_coords = cur_move.dest_co;
+    if (is_empty_coords(init_coords) || is_empty_coords(new_coords))
+    {
+        return board_s;
+    }
+    if (init_coords.x < 0 || init_coords.x > 7 || init_coords.y < 0 || init_coords.y > 7 || new_coords.x < 0 || new_coords.x > 7 || new_coords.y < 0 || new_coords.y > 7)
+    {
+        return board_s;
+    }
     Piece move_piece = get_piece(board_s->board, init_coords);
     //  castling
     if (new_coords.y == 6 && init_coords.y == 4)
@@ -305,7 +313,7 @@ BoardState *move_piece_forced(BoardState *board_s, Move cur_move)
         board_s->board[new_coords.x][0] = empty_piece();
     }
     // en passant
-    if (move_piece.name == 'P' && is_empty(board_s->board[new_coords.x][new_coords.y]) && new_coords.y != init_coords.y)
+    if (move_piece.name == 'P' && is_empty(board_s->board[new_coords.x][new_coords.y]) && new_coords.y != init_coords.y && ((init_coords.x == 3 && new_coords.x == 2) || (init_coords.x == 4 && new_coords.x == 5)))
     {
         if (move_piece.color == 'w')
         {
@@ -479,8 +487,10 @@ bool can_move(BoardState *board_s, Piece piece, Coords init_co, Coords new_co, b
         new_board_s = move_piece_forced(new_board_s, sel_move);
         if (is_check(new_board_s, piece.color))
         {
+            free(new_board_s);
             return false;
         }
+        free(new_board_s);
     }
 
     // printf("piece is %c of color %c\n", piece.name, piece.color);

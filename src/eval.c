@@ -2,6 +2,7 @@
 #include "types.h"
 #include "chess_logic.h"
 #include <stdlib.h>
+#include <stdbool.h>
 
 extern int MAX_SCORE;
 
@@ -53,51 +54,9 @@ int piece_eval(char piece_name, int x, int y)
     }
 }
 
-void print_board2(BoardState *board_s)
-{
-    Piece(*board)[8] = board_s->board;
-    for (int i = 7; i >= 0; i--)
-    {
-        printf("%d ", i + 1);
-        for (int j = 0; j < 8; j++)
-        {
-            if (board[i][j].color == 'w')
-            {
-                printf("%c ", board[i][j].name);
-            }
-            else if (board[i][j].color == 'b')
-            {
-                printf("%c ", board[i][j].name + 32);
-            }
-            else
-            {
-                printf("  ");
-            }
-        }
-        printf("\n");
-    }
-    printf("  a b c d e f g h\n");
-}
-
-void print_board_history(PositionList *board_history)
-{
-    PositionList *pos_l = board_history;
-    while (pos_l != NULL)
-    {
-        print_board2(pos_l->board_s);
-        pos_l = pos_l->tail;
-    }
-    printf("\n\n\n\n");
-}
-
-int *eval_game_ended(PositionList *board_history)
+bool eval_game_ended(PositionList *board_history, int *result)
 {
     BoardState *board_s = board_history->board_s;
-    int *result = malloc(sizeof(int));
-    if (result == NULL)
-    {
-        return NULL;
-    }
 
     // check for mates
     bool white_mate = is_mate(board_s, 'w');
@@ -125,10 +84,9 @@ int *eval_game_ended(PositionList *board_history)
     }
     else
     {
-        free(result);
-        return NULL;
+        return false;
     }
-    return result;
+    return true;
 }
 
 // evaluate the board state for the white player

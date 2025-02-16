@@ -51,10 +51,12 @@ int main()
 
     for (int i = 0; i < 200; i++)
     {
+        /*
         // ask for ENTER key
         printf("Press [Enter] key to continue.\n");
         fflush(stdin); // option ONE to clean stdin
         getchar();     // wait for ENTER
+        */
         if (color == 'w')
         {
             move = iterative_deepening(board_history, color, 3);
@@ -70,6 +72,7 @@ int main()
         print_board(board_s);
         print_move(move);
     }
+    free(board_s);
 
     return 0;
 }

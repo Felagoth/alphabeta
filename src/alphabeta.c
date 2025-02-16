@@ -132,13 +132,8 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
             new_board_s = move_piece(new_board_s, new_move);
             new_board_history->board_s = new_board_s;
             int new_score;
-            int *eval_game_ended_res = eval_game_ended(new_board_history);
-            if (eval_game_ended_res != NULL)
-            {
-                new_score = *eval_game_ended_res;
-                free(eval_game_ended_res);
-            }
-            else
+            bool eval_game_ended_res = eval_game_ended(new_board_history, &new_score);
+            if (!eval_game_ended_res)
             {
                 MoveScore new_move_score = alphabeta(alpha, beta, depth + 1, max_depth, new_board_history, next_color, new_move, 0, 1);
                 new_score = new_move_score.score;
@@ -168,13 +163,8 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
             new_board_s = move_piece(new_board_s, new_move);
             new_board_history->board_s = new_board_s;
             int new_score;
-            int *eval_game_ended_res = eval_game_ended(new_board_history);
-            if (eval_game_ended_res != NULL)
-            {
-                new_score = *eval_game_ended_res;
-                free(eval_game_ended_res);
-            }
-            else
+            bool eval_game_ended_res = eval_game_ended(new_board_history, &new_score);
+            if (!eval_game_ended_res)
             {
                 MoveScore new_move_score = alphabeta(alpha, beta, depth + 1, max_depth, new_board_history, next_color, new_move, 1, 0);
                 new_score = new_move_score.score;
