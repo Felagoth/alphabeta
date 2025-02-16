@@ -187,30 +187,9 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
             }
         }
     }
-    if (move_list == NULL)
-    {
-        printf("move_list is NULL\n");
-    }
-    else
-    {
-        free(move_list);
-    }
-    if (new_board_s == NULL)
-    {
-        printf("new_board_s is NULL\n");
-    }
-    else
-    {
-        free(new_board_s);
-    }
-    if (new_board_history == NULL)
-    {
-        printf("new_board_history is NULL\n");
-    }
-    else
-    {
-        free(new_board_history);
-    }
+    free(move_list);
+    free(new_board_s);
+    free(new_board_history);
     return result;
 }
 

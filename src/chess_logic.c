@@ -459,6 +459,78 @@ BoardState *init_board()
     return board_s;
 }
 
+BoardState *FEN_to_board(char *FEN)
+{
+    BoardState *board_s = malloc(sizeof(BoardState));
+    if (board_s == NULL)
+    {
+        return NULL;
+    }
+    int i = 0;
+    int x = 0;
+    int y = 0;
+    while (FEN[i] != ' ')
+    {
+        if (FEN[i] == '/')
+        {
+            i++;
+            x++;
+            y = 0;
+        }
+        if (FEN[i] >= '1' && FEN[i] <= '8')
+        {
+            for (int k = 0; k < FEN[i] - '0'; k++)
+            {
+                board_s->board[x][y].name = ' ';
+                board_s->board[x][y].color = ' ';
+                y++;
+            }
+        }
+        else
+        {
+            board_s->board[x][i - j].name = FEN[i];
+            if (FEN[i] >= 'A' && FEN[i] <= 'Z')
+            {
+                board_s->board[j][i - j].color = 'w';
+            }
+            else
+            {
+                board_s->board[j][i - j].color = 'b';
+            }
+            j++;
+        }
+        i++;
+    }
+    i++;
+    if (FEN[i] == 'w')
+    {
+        board_s->white_kingside_castlable = true;
+        board_s->white_queenside_castlable = true;
+        board_s->black_kingside_castlable = true;
+        board_s->black_queenside_castlable = true;
+    }
+    else
+    {
+        board_s->white_kingside_castlable = false;
+        board_s->white_queenside_castlable = false;
+        board_s->black_kingside_castlable = false;
+        board_s->black_queenside_castlable = false;
+    }
+    i = i + 2;
+    if (FEN[i] != '-')
+    {
+        board_s->black_pawn_passant = FEN[i] - 'a';
+        board_s->white_pawn_passant = FEN[i] - 'a';
+    }
+    else
+    {
+        board_s->black_pawn_passant = -1;
+        board_s->white_pawn_passant = -1;
+    }
+    board_s->fifty_move_rule = 0;
+    return board_s;
+}
+
 bool can_move(BoardState *board_s, Piece piece, Coords init_co, Coords new_co, bool check_would_stop)
 {
     // pre-checks to see if the move is valid
