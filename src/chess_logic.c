@@ -151,12 +151,11 @@ bool can_move_heuristic(BoardState *board_s, Piece piece, Coords init_co, Coords
 
 bool is_attacked(BoardState *board_s, Coords co, char color, bool check_would_stop)
 {
-    Piece(*board)[8] = board_s->board;
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
         {
-            Piece piece = board[i][j];
+            Piece piece = board_s->board[i][j];
             if (piece.color != color)
             {
                 Coords piece_coords;
@@ -474,14 +473,14 @@ bool can_move(BoardState *board_s, Piece piece, Coords init_co, Coords new_co, b
     if (check_would_stop)
     {
         BoardState *new_board_s = malloc(sizeof(BoardState));
-        Move sel_move;
-        sel_move.init_co = init_co;
-        sel_move.dest_co = new_co;
-        sel_move.promotion = NULL;
         if (new_board_s == NULL)
         {
             return false;
         }
+        Move sel_move;
+        sel_move.init_co = init_co;
+        sel_move.dest_co = new_co;
+        sel_move.promotion = NULL;
         *new_board_s = *board_s;
         // printf("can_move: %c (%d, %d) -> (%d, %d)\n", piece.name, init_co.x, init_co.y, new_co.x, new_co.y);
         new_board_s = move_piece_forced(new_board_s, sel_move);
