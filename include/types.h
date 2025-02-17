@@ -2,11 +2,14 @@
 #define TYPES_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #define MAX_SEARCH_PLY 128
 #define MAX_MOVES 128
 
 typedef int Score;
+
+typedef uint64_t Bitboard;
 
 typedef struct
 {
