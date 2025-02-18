@@ -71,6 +71,22 @@ int main()
         color = color == 'w' ? 'b' : 'w';
         print_board(board_s);
         print_move(move);
+        if (is_check(board_s, color))
+        {
+            printf("check\n");
+        }
+        if (is_mate(board_s, color))
+        {
+            if (is_check(board_s, color))
+            {
+                printf("checkmate\n");
+            }
+            else
+            {
+                printf("stalemate\n");
+            }
+            break;
+        }
     }
     free(board_s);
 

@@ -50,6 +50,7 @@ Bitboard init_black_pawns()
     return 0xFF000000000000;
 }
 
+// the not files are used to avoid wrap arounds
 Bitboard get_white_pawn_pseudo_moves(Bitboard pawns, Bitboard empty, Bitboard enemy, int en_passant)
 {
     Bitboard moves_1_square = (pawns << 8) & empty;
@@ -197,9 +198,9 @@ Bitboard get_king_pseudo_moves_nocastle(Bitboard kings, Bitboard ally)
     Bitboard not_a_file = ~FILE_A;
     Bitboard not_h_file = ~FILE_H;
     Bitboard king_moves = ((kings << 8) | (kings >> 8) |
-                           ((kings << 1) & not_a_file) | ((kings >> 1) & not_h_file) |
-                           ((kings << 9) & not_a_file) | ((kings << 7) & not_h_file) |
-                           ((kings >> 9) & not_h_file) | ((kings >> 7) & not_a_file));
+                           ((kings << 1) & not_h_file) | ((kings >> 1) & not_a_file) |
+                           ((kings << 9) & not_h_file) | ((kings << 7) & not_a_file) |
+                           ((kings >> 9) & not_a_file) | ((kings >> 7) & not_h_file));
     return king_moves & ~ally;
 }
 
@@ -208,9 +209,9 @@ Bitboard get_king_pseudo_moves(Bitboard kings, Bitboard ally, Bitboard blockers,
     Bitboard not_a_file = ~FILE_A;
     Bitboard not_h_file = ~FILE_H;
     Bitboard king_moves = ((kings << 8) | (kings >> 8) |
-                           ((kings << 1) & not_a_file) | ((kings >> 1) & not_h_file) |
-                           ((kings << 9) & not_a_file) | ((kings << 7) & not_h_file) |
-                           ((kings >> 9) & not_h_file) | ((kings >> 7) & not_a_file));
+                           ((kings << 1) & not_h_file) | ((kings >> 1) & not_a_file) |
+                           ((kings << 9) & not_h_file) | ((kings << 7) & not_a_file) |
+                           ((kings >> 9) & not_a_file) | ((kings >> 7) & not_h_file));
 
     if (kingside_castlable)
     {
@@ -294,8 +295,8 @@ void add_move_co(MoveList *move_list, int init_square, int dest_square, PieceTyp
         move_list->moves[move_list->size].init_co = square_to_coords(init_square);
         move_list->moves[move_list->size].dest_co = square_to_coords(dest_square);
         move_list->moves[move_list->size].promotion = ' ';
+        move_list->size++;
     }
-    move_list->size++;
 }
 
 Bitboard get_single_piece_legal_moves(Bitboard piece, Bitboard piece_moves, BoardState *board_s, PieceType piece_type, bool is_check, MoveList *move_list)
