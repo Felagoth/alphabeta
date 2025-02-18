@@ -6,6 +6,9 @@
 #include "types.h"
 #include "chess_logic.h"
 #include "eval.h"
+#include "alphabeta.h"
+#include "bitboards_moves.h"
+#include "debug_functions.h"
 
 const int MAX_SCORE = 100000;
 
@@ -44,7 +47,7 @@ MoveList *possible_moves(BoardState *board_s, char color)
                         Coords dest_co = {k, l};
                         if (can_move_heuristic(board_s, piece, init_co, dest_co, true))
                         {
-                            Move move = empty_move();
+                            Move move = {init_co, dest_co, ' '};
                             if (piece.name == 'P' && (dest_co.x == 0 || dest_co.x == 7))
                             {
                                 for (int p = 0; p < 4; p++)
@@ -56,7 +59,6 @@ MoveList *possible_moves(BoardState *board_s, char color)
                             }
                             else
                             {
-                                move.promotion = ' ';
                                 move_list->moves[move_list->size] = move;
                                 move_list->size++;
                             }
@@ -102,13 +104,25 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
     if (depth == max_depth)
     {
         result.score = alpha_beta_score(board_history, color, is_max);
-        if (result.score != 0)
-        {
-            // printf("depth: %d, move: %c%c -> %c%c, score: %d\n", depth, 'a' + tested_move.init_co.y, '1' + tested_move.init_co.x, 'a' + tested_move.dest_co.y, '1' + tested_move.dest_co.x, result.score);
-        }
         return result;
     }
     MoveList *move_list = possible_moves(board_history->board_s, color);
+    MoveList *move_list1 = possible_moves_bb(board_history->board_s);
+    if (move_list->size != move_list1->size)
+    {
+        if (get_targetbb_move_list(move_list) ^ get_targetbb_move_list(move_list1))
+        {
+            printf("\n\nplayer: %c\n", color);
+            printf("move_list size: %d\n", move_list->size);
+            print_bitboard(get_targetbb_move_list(move_list));
+            print_move_list(move_list);
+            printf("move_list1 size: %d\n", move_list1->size);
+            print_bitboard(get_targetbb_move_list(move_list1));
+            print_move_list(move_list1);
+            print_bitboard(get_targetbb_move_list(move_list) ^ get_targetbb_move_list(move_list1));
+            print_board_debug(board_history->board_s);
+        }
+    }
     if (move_list == NULL)
     {
         if (is_check(board_history->board_s, color))

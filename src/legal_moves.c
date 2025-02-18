@@ -211,7 +211,7 @@ bool can_move_king(BoardState *board_s, Piece selected_piece, Coords init_co, Co
     // white kingside castling
     else if (selected_piece.color == 'w' && newx == 0 && newy == 6 && board_s->white_kingside_castlable)
     {
-        if (board_s->board[0][5].name == ' ' && board_s->board[0][6].name == ' ' && board_s->board[0][7].name == 'R' && board_s->board[0][7].color == 'w')
+        if (board_s->board[0][5].name == ' ' && board_s->board[0][6].name == ' ' && board_s->board[0][7].name == 'R' && board_s->board[0][7].color == 'w' && !is_attacked(board_s, (Coords){0, 5}, 'w', false) && !is_attacked(board_s, (Coords){0, 6}, 'w', false) && !is_attacked(board_s, (Coords){0, 4}, 'w', false))
         {
             return true;
         }
@@ -219,7 +219,7 @@ bool can_move_king(BoardState *board_s, Piece selected_piece, Coords init_co, Co
     // white queenside castling
     else if (selected_piece.color == 'w' && newx == 0 && newy == 2 && board_s->white_queenside_castlable)
     {
-        if (board_s->board[0][1].name == ' ' && board_s->board[0][2].name == ' ' && board_s->board[0][3].name == ' ' && board_s->board[0][0].name == 'R' && board_s->board[0][0].color == 'w')
+        if (board_s->board[0][1].name == ' ' && board_s->board[0][2].name == ' ' && board_s->board[0][3].name == ' ' && board_s->board[0][0].name == 'R' && board_s->board[0][0].color == 'w' && !is_attacked(board_s, (Coords){0, 2}, 'w', false) && !is_attacked(board_s, (Coords){0, 3}, 'w', false) && !is_attacked(board_s, (Coords){0, 4}, 'w', false))
         {
             return true;
         }
@@ -227,7 +227,7 @@ bool can_move_king(BoardState *board_s, Piece selected_piece, Coords init_co, Co
     // black kingside castling
     else if (selected_piece.color == 'b' && newx == 7 && newy == 6 && board_s->black_kingside_castlable)
     {
-        if (board_s->board[7][5].name == ' ' && board_s->board[7][6].name == ' ' && board_s->board[7][7].name == 'R' && board_s->board[7][7].color == 'b')
+        if (board_s->board[7][5].name == ' ' && board_s->board[7][6].name == ' ' && board_s->board[7][7].name == 'R' && board_s->board[7][7].color == 'b' && !is_attacked(board_s, (Coords){7, 5}, 'b', false) && !is_attacked(board_s, (Coords){7, 6}, 'b', false) && !is_attacked(board_s, (Coords){7, 4}, 'b', false))
         {
             return true;
         }
@@ -235,7 +235,7 @@ bool can_move_king(BoardState *board_s, Piece selected_piece, Coords init_co, Co
     // black queenside castling
     else if (selected_piece.color == 'b' && newx == 7 && newy == 2 && board_s->black_queenside_castlable)
     {
-        if (board_s->board[7][1].name == ' ' && board_s->board[7][2].name == ' ' && board_s->board[7][3].name == ' ' && board_s->board[7][0].name == 'R' && board_s->board[7][0].color == 'b')
+        if (board_s->board[7][1].name == ' ' && board_s->board[7][2].name == ' ' && board_s->board[7][3].name == ' ' && board_s->board[7][0].name == 'R' && board_s->board[7][0].color == 'b' && !is_attacked(board_s, (Coords){7, 2}, 'b', false) && !is_attacked(board_s, (Coords){7, 3}, 'b', false) && !is_attacked(board_s, (Coords){7, 4}, 'b', false))
         {
             return true;
         }

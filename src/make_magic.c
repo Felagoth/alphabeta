@@ -32,7 +32,7 @@ void print_bitboard(Bitboard b)
 {
     for (int i = 63; i >= 0; i--)
     {
-        printf("%d", (b >> i) & 1);
+        printf("%d", (int)(b >> i) & 1);
         if (i % 8 == 0)
         {
             printf("\n");
@@ -125,7 +125,7 @@ Bitboard generate_bishop_entry_mask(int square)
     Bitboard mask = 0;
     int x = square % 8;
     int y = square / 8;
-    int dist_ne = (min(7 - y, x));
+    // int dist_ne = (min(7 - y, x));
     for (int i = 1; i < min(x, y); i++)
     {
         mask |= 1ULL << ((y - i) * 8 + x - i);
@@ -147,7 +147,6 @@ Bitboard generate_bishop_entry_mask(int square)
 
 void generate_all_entry_masks()
 {
-    Bitboard all_masks = 0;
     for (int i = 0; i < 64; i++)
     {
         rook_entry_masks[i] = generate_rook_entry_mask(i);
@@ -192,26 +191,26 @@ Bitboard find_bishop_moves(Bitboard blockers, int square)
     Bitboard moves = 0;
     int x = square % 8;
     int y = square / 8;
-    int dist_ne = (min(7 - y, x));
-    for (int i = 1; i < min(x, y); i++)
+    // dist_ne = (min(7 - y, x));
+    for (int i = 1; i <= min(x, y); i++)
     {
         moves |= 1ULL << ((y - i) * 8 + x - i);
         if (blockers & 1ULL << ((y - i) * 8 + x - i))
             break;
     }
-    for (int i = 1; i < min(x, 7 - y); i++)
+    for (int i = 1; i <= min(x, 7 - y); i++)
     {
         moves |= 1ULL << ((y + i) * 8 + x - i);
         if (blockers & 1ULL << ((y + i) * 8 + x - i))
             break;
     }
-    for (int i = 1; i < min(7 - x, 7 - y); i++)
+    for (int i = 1; i <= min(7 - x, 7 - y); i++)
     {
         moves |= 1ULL << ((y + i) * 8 + x + i);
         if (blockers & 1ULL << ((y + i) * 8 + x + i))
             break;
     }
-    for (int i = 1; i < min(7 - x, y); i++)
+    for (int i = 1; i <= min(7 - x, y); i++)
     {
         moves |= 1ULL << ((y - i) * 8 + x + i);
         if (blockers & 1ULL << ((y - i) * 8 + x + i))
@@ -385,7 +384,7 @@ void test_rook_functions()
         printf("moves\n");
         Bitboard moves = find_rook_moves(blockers, square);
         print_bitboard(moves);
-        printf("blockers * magic number:%llu\n", blockers * 0xffff000ff00);
+        printf("blockers * magic number:%lu\n", blockers * 0xffff000ff00);
     }
 }
 
@@ -407,7 +406,7 @@ void test_bishop_functions()
         printf("moves\n");
         Bitboard moves = find_bishop_moves(blockers, square);
         print_bitboard(moves);
-        printf("blockers * magic number:%llu\n", blockers * 0xffff000ff00);
+        printf("blockers * magic number:%lu\n", blockers * 0xffff000ff00);
     }
 }
 
@@ -431,7 +430,7 @@ void test_magic_gen_first_rook_square()
     Bitboard blockers = 4;
     printf("blockers\n");
     print_bitboard(blockers);
-    printf("index: %llu\n", blockers * rook_magic_numbers[0] >> (64 - rook_index_bits[0]));
+    printf("index: %lu\n", blockers * rook_magic_numbers[0] >> (64 - rook_index_bits[0]));
     Bitboard moves = get_rook_moves(blockers, 0);
     print_bitboard(moves);
 }
@@ -517,7 +516,7 @@ void save_bb_array_to_file(const Bitboard *array, size_t size, const char *filen
     fprintf(file, "{");
     for (size_t i = 0; i < size; ++i)
     {
-        fprintf(file, "%lluULL", array[i]);
+        fprintf(file, "%luULL", array[i]);
         if (i < size - 1)
         {
             fprintf(file, ", ");
@@ -544,7 +543,7 @@ void save_mag_table_to_file(const Bitboard *array, size_t size, size_t second_di
         fprintf(file, "{");
         for (size_t j = 0; j < size2; ++j)
         {
-            fprintf(file, "%lluULL", *((array + i * second_dim_max_size) + j));
+            fprintf(file, "%luULL", *((array + i * second_dim_max_size) + j));
             if (j < size2 - 1)
             {
                 fprintf(file, ", ");
@@ -569,16 +568,16 @@ int main()
     // test_bishop_functions();
     // test_magic_gen_first_rook_square();
 
-    generate_all_rook_magik();
+    // generate_all_rook_magik();
     // test_rook_magik();
 
-    save_int_array_to_file(rook_index_bits, 64, "builds/magik/rook_index_bits.txt");
-    save_bb_array_to_file(rook_magic_numbers, 64, "builds/magik/rook_magic_numbers.txt");
-    save_bb_array_to_file(rook_entry_masks, 64, "builds/magik/rook_entry_masks.txt");
-    save_mag_table_to_file((const Bitboard *)rook_table, 64, 4096, rook_index_bits, "builds/magik/rook_table.txt");
+    // save_int_array_to_file(rook_index_bits, 64, "builds/magik/rook_index_bits.txt");
+    // save_bb_array_to_file(rook_magic_numbers, 64, "builds/magik/rook_magic_numbers.txt");
+    // save_bb_array_to_file(rook_entry_masks, 64, "builds/magik/rook_entry_masks.txt");
+    // save_mag_table_to_file((const Bitboard *)rook_table, 64, 4096, rook_index_bits, "builds/magik/rook_table.txt");
 
     generate_all_bishop_magik();
-    // test_bishop_magik();
+    test_bishop_magik();
 
     save_int_array_to_file(bishop_index_bits, 64, "builds/magik/bishop_index_bits.txt");
     save_bb_array_to_file(bishop_magic_numbers, 64, "builds/magik/bishop_magic_numbers.txt");

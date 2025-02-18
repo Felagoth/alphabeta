@@ -52,6 +52,19 @@ bool are_same_piece(Piece piece1, Piece piece2)
     return piece1.name == piece2.name && piece1.color == piece2.color;
 }
 
+int coords_to_square(Coords co)
+{
+    return co.x * 8 + 7 - co.y;
+}
+
+Coords square_to_coords(int square)
+{
+    Coords coords;
+    coords.x = square / 8;
+    coords.y = 7 - square % 8;
+    return coords;
+}
+
 PositionList *empty_list()
 {
     return NULL;
@@ -195,10 +208,14 @@ BoardState *move_pawn_handling(BoardState *board_s, Piece move_piece, Piece dest
     if (move_piece.color == 'w' && is_empty(dest_piece) && new_coords.y != init_coords.y)
     {
         board_s->board[new_coords.x - 1][new_coords.y] = empty_piece();
+        board_s->color_bb[BLACK] &= ~(1ULL << (39 - new_coords.y)); // 39 = 4 * 8 + 7 (to get the fith row)
+        board_s->all_pieces_bb[BLACK][PAWN] &= ~(1ULL << (39 - new_coords.y));
     }
     else if (move_piece.color == 'b' && is_empty(dest_piece) && new_coords.y != init_coords.y)
     {
         board_s->board[new_coords.x + 1][new_coords.y] = empty_piece();
+        board_s->color_bb[WHITE] &= ~(1ULL << (31 - new_coords.y)); // 31 = 3 * 8 + 7 (to get the second row)
+        board_s->all_pieces_bb[WHITE][PAWN] &= ~(1ULL << (31 - new_coords.y));
     }
     return board_s;
 }
@@ -251,17 +268,63 @@ BoardState *move_rook_handling(BoardState *board_s, Piece piece, Coords init_coo
     return board_s;
 }
 
+Color char_to_color(char c)
+{
+    return c == 'w' ? WHITE : BLACK;
+}
+
+PieceType char_to_piece_type(char c)
+{
+    switch (c)
+    {
+    case 'P':
+        return PAWN;
+    case 'N':
+        return KNIGHT;
+    case 'B':
+        return BISHOP;
+    case 'R':
+        return ROOK;
+    case 'Q':
+        return QUEEN;
+    case 'K':
+        return KING;
+    default:
+        return -1;
+    }
+}
+
 BoardState *move_piece(BoardState *board_s, Move sel_move)
 {
     Coords init_coords = sel_move.init_co;
     Coords new_coords = sel_move.dest_co;
     Piece move_piece = get_piece(board_s->board, init_coords);
     Piece dest_piece = get_piece(board_s->board, new_coords);
+    Color color = char_to_color(move_piece.color);
+    Color enemy_color = color == WHITE ? BLACK : WHITE;
+    if (is_empty(move_piece))
+    {
+        return board_s;
+    }
+    // printf("move_piece: color: %c, init_coords: (%d, %d), new_coords: (%d, %d)\n", move_piece.color, init_coords.x, init_coords.y, new_coords.x, new_coords.y);
+    // update board
     board_s->white_pawn_passant = -1;
     board_s->black_pawn_passant = -1;
+    // put the piece in the new location
     board_s->board[new_coords.x][new_coords.y].name = move_piece.name;
     board_s->board[new_coords.x][new_coords.y].color = move_piece.color;
+    board_s->color_bb[color] |= 1ULL << coords_to_square(new_coords);
+    board_s->all_pieces_bb[color][char_to_piece_type(move_piece.name)] |= 1ULL << coords_to_square(new_coords);
+    // remove the piece from the old location
     board_s->board[init_coords.x][init_coords.y] = empty_piece();
+    board_s->color_bb[color] ^= 1ULL << coords_to_square(init_coords);
+    board_s->all_pieces_bb[color][char_to_piece_type(move_piece.name)] ^= 1ULL << coords_to_square(init_coords);
+    // remove the piece from the enemy if it exists
+    if (dest_piece.color != ' ')
+    {
+        board_s->color_bb[enemy_color] ^= 1ULL << coords_to_square(new_coords);
+        board_s->all_pieces_bb[enemy_color][char_to_piece_type(dest_piece.name)] ^= 1ULL << coords_to_square(new_coords);
+    }
     // fifty move rule
     if (dest_piece.name == ' ' && move_piece.name != 'P')
     {
@@ -271,6 +334,7 @@ BoardState *move_piece(BoardState *board_s, Move sel_move)
     {
         board_s->fifty_move_rule = 0;
     }
+    // handle special moves
     if (move_piece.name == 'P')
     {
         board_s = move_pawn_handling(board_s, move_piece, dest_piece, sel_move);
@@ -283,6 +347,8 @@ BoardState *move_piece(BoardState *board_s, Move sel_move)
     {
         board_s = move_rook_handling(board_s, move_piece, init_coords, new_coords);
     }
+    // switch player
+    board_s->player = board_s->player == WHITE ? BLACK : WHITE;
     return board_s;
 }
 

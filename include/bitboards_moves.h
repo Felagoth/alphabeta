@@ -1,4 +1,5 @@
 #ifndef BITBOARDS_MOVES_H
+#define BITBOARDS_MOVES_H
 
 #include "types.h"
 

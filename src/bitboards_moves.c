@@ -1,10 +1,12 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
-#include "../include/types.h"
-// #include "../include/chess_logic.h"
-#include "../include/magic_tables.h"
+#include "types.h"
+#include "magic_tables.h"
+#include "debug_functions.h"
+#include "chess_logic.h"
 
 // use bitboards to generate possible moves
 
@@ -18,35 +20,10 @@ typedef uint64_t Bitboard;
 #define RANK_6 0xFF0000000000
 #define RANK_7 0xFF000000000000
 #define RANK_8 0xFF00000000000000
-#define FILE_A 0x0101010101010101
-#define FILE_B 0x0202020202020202
-#define FILE_C 0x0404040404040404
-#define FILE_D 0x0808080808080808
-#define FILE_E 0x1010101010101010
-#define FILE_F 0x2020202020202020
-#define FILE_G 0x4040404040404040
-#define FILE_H 0x8080808080808080
-
-void print_bitboard(Bitboard b)
-{
-    for (int i = 63; i >= 0; i--)
-    {
-        printf("%d", (int)(b >> i) & 1);
-        if (i % 8 == 0)
-        {
-            printf("\n");
-        }
-    }
-    printf("\n");
-}
-
-Coords get_coords(int square)
-{
-    Coords coords;
-    coords.x = square / 8;
-    coords.y = square % 8;
-    return coords;
-}
+#define FILE_A 0x8080808080808080
+#define FILE_B 0x4040404040404040
+#define FILE_G 0x0202020202020202
+#define FILE_H 0x0101010101010101
 
 Bitboard init_white()
 {
@@ -77,13 +54,13 @@ Bitboard get_white_pawn_pseudo_moves(Bitboard pawns, Bitboard empty, Bitboard en
 {
     Bitboard moves_1_square = (pawns << 8) & empty;
     Bitboard moves_2_squares = ((moves_1_square & RANK_3) << 8) & empty;
-    Bitboard attacks = ((pawns & ~FILE_A) << 7) & enemy;
-    attacks |= ((pawns & ~FILE_H) << 9) & enemy;
+    Bitboard attacks = ((pawns & ~FILE_A) << 9) & enemy;
+    attacks |= ((pawns & ~FILE_H) << 7) & enemy;
     if (en_passant != -1)
     {
-        Bitboard en_passant_square = 1ULL << en_passant;
-        attacks |= (pawns & ~FILE_A) << 7 & en_passant_square;
-        attacks |= (pawns & ~FILE_H) << 9 & en_passant_square;
+        Bitboard en_passant_square = 1ULL << (47 - en_passant); // 7 - en_passant + 5*8 is the square of the en passant pawn
+        attacks |= (pawns & ~FILE_A) << 9 & en_passant_square;
+        attacks |= (pawns & ~FILE_H) << 7 & en_passant_square;
     }
     return (moves_1_square | moves_2_squares | attacks);
 }
@@ -92,13 +69,13 @@ Bitboard get_black_pawn_pseudo_moves(Bitboard pawns, Bitboard empty, Bitboard en
 {
     Bitboard moves_1_square = (pawns >> 8) & empty;
     Bitboard moves_2_squares = ((moves_1_square & RANK_6) >> 8) & empty;
-    Bitboard attacks = ((pawns & ~FILE_A) >> 9) & enemy;
-    attacks |= ((pawns & ~FILE_H) >> 7) & enemy;
+    Bitboard attacks = ((pawns & ~FILE_H) >> 9) & enemy;
+    attacks |= ((pawns & ~FILE_A) >> 7) & enemy;
     if (en_passant != -1)
     {
-        Bitboard en_passant_column = FILE_A << en_passant;
-        attacks |= (pawns & ~FILE_A) >> 9 & en_passant_column;
-        attacks |= (pawns & ~FILE_H) >> 7 & en_passant_column;
+        Bitboard en_passant_square = 1ULL << (23 - en_passant); // 7 - en_passant + 2*8
+        attacks |= (pawns & ~FILE_H) >> 9 & en_passant_square;
+        attacks |= (pawns & ~FILE_A) >> 7 & en_passant_square;
     }
     return (moves_1_square | moves_2_squares | attacks);
 }
@@ -120,16 +97,16 @@ Bitboard get_knight_pseudo_moves(Bitboard knights, Bitboard ally)
     Bitboard not_ab_file = ~FILE_A & ~FILE_B;
     Bitboard not_h_file = ~FILE_H;
     Bitboard not_gh_file = ~FILE_H & ~FILE_G;
-    Bitboard knight_moves_north = (knights << 17) & not_a_file;
-    knight_moves_north |= (knights << 15) & not_h_file;
-    knight_moves_north |= (knights << 10) & not_ab_file;
-    knight_moves_north |= (knights << 6) & not_gh_file;
-    Bitboard knight_moves_south = (knights >> 17) & not_h_file;
-    knight_moves_south |= (knights >> 15) & not_a_file;
-    knight_moves_south |= (knights >> 10) & not_gh_file;
-    knight_moves_south |= (knights >> 6) & not_ab_file;
+    Bitboard knight_moves_north = (knights << 17) & not_h_file;
+    knight_moves_north |= (knights << 15) & not_a_file;
+    knight_moves_north |= (knights << 10) & not_gh_file;
+    knight_moves_north |= (knights << 6) & not_ab_file;
+    Bitboard knight_moves_south = (knights >> 17) & not_a_file;
+    knight_moves_south |= (knights >> 15) & not_h_file;
+    knight_moves_south |= (knights >> 10) & not_ab_file;
+    knight_moves_south |= (knights >> 6) & not_gh_file;
     knight_moves = knight_moves_north | knight_moves_south;
-    return knight_moves & ~knights & ~ally;
+    return knight_moves & ~ally;
 }
 
 Bitboard init_white_bishops()
@@ -197,7 +174,7 @@ Bitboard init_white_queens()
 
 Bitboard init_black_queens()
 {
-    return 0x100000000000000;
+    return 0x1000000000000000;
 }
 
 Bitboard get_queen_pseudo_moves(Bitboard queens, Bitboard ally, Bitboard blockers)
@@ -215,7 +192,7 @@ Bitboard init_black_kings()
     return 0x800000000000000;
 }
 
-Bitboard get_king_pseudo_moves(Bitboard kings, Bitboard ally)
+Bitboard get_king_pseudo_moves_nocastle(Bitboard kings, Bitboard ally)
 {
     Bitboard not_a_file = ~FILE_A;
     Bitboard not_h_file = ~FILE_H;
@@ -223,6 +200,33 @@ Bitboard get_king_pseudo_moves(Bitboard kings, Bitboard ally)
                            ((kings << 1) & not_a_file) | ((kings >> 1) & not_h_file) |
                            ((kings << 9) & not_a_file) | ((kings << 7) & not_h_file) |
                            ((kings >> 9) & not_h_file) | ((kings >> 7) & not_a_file));
+    return king_moves & ~ally;
+}
+
+Bitboard get_king_pseudo_moves(Bitboard kings, Bitboard ally, Bitboard blockers, Bitboard threatened_squares, Color color, bool kingside_castlable, bool queenside_castlable)
+{
+    Bitboard not_a_file = ~FILE_A;
+    Bitboard not_h_file = ~FILE_H;
+    Bitboard king_moves = ((kings << 8) | (kings >> 8) |
+                           ((kings << 1) & not_a_file) | ((kings >> 1) & not_h_file) |
+                           ((kings << 9) & not_a_file) | ((kings << 7) & not_h_file) |
+                           ((kings >> 9) & not_h_file) | ((kings >> 7) & not_a_file));
+
+    if (kingside_castlable)
+    {
+        Bitboard kingside_block_mask = color == WHITE ? 6 : 0x600000000000000;
+        Bitboard kingside_threatened_mask = color == WHITE ? 0xe : 0xe00000000000000;
+        if ((blockers & kingside_block_mask) == 0 && (threatened_squares & kingside_threatened_mask) == 0)
+            king_moves |= (kings >> 2);
+    }
+    else if (queenside_castlable)
+    {
+        Bitboard queenside_block_mask = color == WHITE ? 0x70 : 0x7000000000000000;
+        Bitboard queenside_threatened_mask = color == WHITE ? 0x38 : 0x3800000000000000;
+        if ((blockers & queenside_block_mask) == 0 && (threatened_squares & queenside_threatened_mask) == 0)
+            king_moves |= (kings << 2);
+    }
+
     return king_moves & ~ally;
 }
 
@@ -243,7 +247,7 @@ Bitboard get_attacks(BoardState *board_s)
     attacks |= get_rook_pseudo_moves(all_pieces_bb[enemy_color][ROOK], enemy, blockers);
     attacks |= get_bishop_pseudo_moves(all_pieces_bb[enemy_color][BISHOP], enemy, blockers);
     attacks |= get_queen_pseudo_moves(all_pieces_bb[enemy_color][QUEEN], enemy, blockers);
-    attacks |= get_king_pseudo_moves(all_pieces_bb[enemy_color][KING], enemy);
+    attacks |= get_king_pseudo_moves_nocastle(all_pieces_bb[enemy_color][KING], enemy);
     return attacks;
 }
 
@@ -268,8 +272,6 @@ Bitboard get_new_attacks(Bitboard all_pieces_bb[2][6], Bitboard enemy, Bitboard 
 
 bool is_king_left_in_check(Bitboard all_pieces_bb[2][6], Bitboard enemy, Bitboard blockers, Color color)
 {
-    // in theory we shouldn't need to check all the (pseudo) attacks, en passant rule has no effect on the the king for example
-    // but it's easier to just get all the attacks, hopefully this will not really affect performance
     Bitboard king = all_pieces_bb[color][KING];
     Bitboard attacks = get_new_attacks(all_pieces_bb, enemy, blockers, color == WHITE ? BLACK : WHITE);
     return (attacks & king) != 0;
@@ -277,20 +279,20 @@ bool is_king_left_in_check(Bitboard all_pieces_bb[2][6], Bitboard enemy, Bitboar
 
 void add_move_co(MoveList *move_list, int init_square, int dest_square, PieceType piece_type)
 {
-    if (piece_type == PAWN && (move_list->moves[move_list->size].dest_co.x == 0 || move_list->moves[move_list->size].dest_co.x == 7))
+    if (piece_type == PAWN && (dest_square / 8 == 0 || dest_square / 8 == 7))
     {
         for (int p = 0; p < 4; p++)
         {
-            move_list->moves[move_list->size].init_co = get_coords(init_square);
-            move_list->moves[move_list->size].dest_co = get_coords(dest_square);
+            move_list->moves[move_list->size].init_co = square_to_coords(init_square);
+            move_list->moves[move_list->size].dest_co = square_to_coords(dest_square);
             move_list->moves[move_list->size].promotion = "QNBR"[p];
             move_list->size++;
         }
     }
     else
     {
-        move_list->moves[move_list->size].init_co = get_coords(init_square);
-        move_list->moves[move_list->size].dest_co = get_coords(dest_square);
+        move_list->moves[move_list->size].init_co = square_to_coords(init_square);
+        move_list->moves[move_list->size].dest_co = square_to_coords(dest_square);
         move_list->moves[move_list->size].promotion = ' ';
     }
     move_list->size++;
@@ -300,17 +302,6 @@ Bitboard get_single_piece_legal_moves(Bitboard piece, Bitboard piece_moves, Boar
 {
     int piece_square = __builtin_ctzll(piece);
     Bitboard legal_moves = 0;
-    if (piece_type == KING)
-    {
-        legal_moves = piece_moves & ~get_attacks(board_s);
-        while (legal_moves)
-        {
-            int move_square = __builtin_ctzll(legal_moves);
-            legal_moves &= legal_moves - 1;
-            add_move_co(move_list, piece_square, move_square, piece_type);
-        }
-        return legal_moves;
-    }
     Color color = board_s->player;
     Color enemy_color = board_s->player == WHITE ? BLACK : WHITE;
     Bitboard ally = board_s->color_bb[color];
@@ -323,19 +314,30 @@ Bitboard get_single_piece_legal_moves(Bitboard piece, Bitboard piece_moves, Boar
 
     BoardState board_s_temp_val;
     BoardState *board_s_temp = &board_s_temp_val;
+    if (piece_type == KING)
+    {
+        piece_moves &= ~get_attacks(board_s);
+    }
     while (piece_moves)
     {
         int move_square = __builtin_ctzll(piece_moves);
         piece_moves &= piece_moves - 1;
         move = 1ULL << move_square;
 
-        if (is_check) // if the king is in check we need to check if the move removes the check
+        // if the king is in check we need to check if the move removes the check
+        // if it is the king that moves we need to check if it will not be threatened after (more than only the already threatened squares)
+        // In these cases we do the complete move at it is more easy
+        if (is_check || piece_type == KING)
         {
             // Make the move on a temporary board state
             *board_s_temp = *board_s;
             board_s_temp->all_pieces_bb[color][piece_type] = (board_s->all_pieces_bb[color][piece_type] & ~piece) | move;
             board_s_temp->color_bb[color] = (board_s->color_bb[color] & ~piece) | move;
-            board_s_temp->all_pieces_bb[enemy_color][piece_type] = board_s->all_pieces_bb[enemy_color][piece_type] & ~move;
+            for (PieceType enemy_piece_type = PAWN; enemy_piece_type <= KING; enemy_piece_type++)
+            {
+                board_s_temp->all_pieces_bb[enemy_color][enemy_piece_type] &= ~move;
+            }
+            board_s_temp->color_bb[enemy_color] &= ~move;
             if (!is_king_in_check(board_s_temp))
             {
                 legal_moves |= move;
@@ -344,9 +346,12 @@ Bitboard get_single_piece_legal_moves(Bitboard piece, Bitboard piece_moves, Boar
         }
         else // else we only need to check if the move doesn't put the king in check
         {
-            // Make the move temporarily only for the blockers
-            // not necessary:
-            all_pieces_bb_temp[enemy_color][piece_type] = board_s->all_pieces_bb[enemy_color][piece_type] & ~move;
+            // Make the move temporarily only for the blockers and enemies
+            memcpy(all_pieces_bb_temp, board_s->all_pieces_bb, sizeof(all_pieces_bb_temp));
+            for (PieceType enemy_piece_type = PAWN; enemy_piece_type <= KING; enemy_piece_type++)
+            {
+                all_pieces_bb_temp[enemy_color][enemy_piece_type] = board_s->all_pieces_bb[enemy_color][enemy_piece_type] & ~move;
+            }
             blockers_temp = (blockers & ~piece) | move;
             if (!is_king_left_in_check(all_pieces_bb_temp, enemy, blockers_temp, color))
             {
@@ -372,9 +377,9 @@ Bitboard get_piece_moves(BoardState *board_s, PieceType piece_type, bool is_chec
         {
         case PAWN:
             if (board_s->player == WHITE)
-                piece_moves = get_white_pawn_pseudo_moves(piece, board_s->color_bb[WHITE], board_s->color_bb[BLACK], board_s->black_pawn_passant);
+                piece_moves = get_white_pawn_pseudo_moves(piece, ~board_s->color_bb[WHITE] & ~board_s->color_bb[BLACK], board_s->color_bb[BLACK], board_s->black_pawn_passant);
             else
-                piece_moves = get_black_pawn_pseudo_moves(piece, board_s->color_bb[BLACK], board_s->color_bb[WHITE], board_s->white_pawn_passant);
+                piece_moves = get_black_pawn_pseudo_moves(piece, ~board_s->color_bb[WHITE] & ~board_s->color_bb[BLACK], board_s->color_bb[WHITE], board_s->white_pawn_passant);
             break;
         case KNIGHT:
             piece_moves = get_knight_pseudo_moves(piece, board_s->color_bb[board_s->player]);
@@ -389,7 +394,10 @@ Bitboard get_piece_moves(BoardState *board_s, PieceType piece_type, bool is_chec
             piece_moves = get_queen_pseudo_moves(piece, board_s->color_bb[board_s->player], board_s->color_bb[WHITE] | board_s->color_bb[BLACK]);
             break;
         case KING:
-            piece_moves = get_king_pseudo_moves(piece, board_s->color_bb[board_s->player]);
+            if (board_s->player == WHITE)
+                piece_moves = get_king_pseudo_moves(piece, board_s->color_bb[WHITE], board_s->color_bb[WHITE] | board_s->color_bb[BLACK], get_attacks(board_s), WHITE, board_s->white_kingside_castlable, board_s->white_queenside_castlable);
+            else
+                piece_moves = get_king_pseudo_moves(piece, board_s->color_bb[BLACK], board_s->color_bb[WHITE] | board_s->color_bb[BLACK], get_attacks(board_s), BLACK, board_s->black_kingside_castlable, board_s->black_queenside_castlable);
             break;
         }
         legal_moves |= get_single_piece_legal_moves(piece, piece_moves, board_s, piece_type, is_check, move_list);
@@ -413,48 +421,4 @@ MoveList *possible_moves_bb(BoardState *board_s)
     get_piece_moves(board_s, QUEEN, is_check, move_list);
     get_piece_moves(board_s, KING, is_check, move_list);
     return move_list;
-}
-
-void test_basics()
-{
-    Bitboard white = init_white();
-    Bitboard black = init_black();
-    Bitboard empty_squares = get_empty(white, black);
-    Bitboard white_pawns = init_white_pawns();
-    Bitboard black_pawns = init_black_pawns();
-    Bitboard white_knights = init_white_knights();
-    Bitboard black_knights = init_black_knights();
-    Bitboard white_bishops = init_white_bishops();
-    Bitboard black_bishops = init_black_bishops();
-    Bitboard white_pawn_moves = get_white_pawn_pseudo_moves(white_pawns, empty_squares, black, -1);
-    Bitboard black_pawn_moves = get_black_pawn_pseudo_moves(black_pawns, empty_squares, white, -1);
-    Bitboard white_knight_moves = get_knight_pseudo_moves(white_knights, white);
-    Bitboard black_knight_moves = get_knight_pseudo_moves(black_knights, black);
-    Bitboard white_bishop_moves = get_bishop_pseudo_moves(white_bishops, white, white | black);
-    Bitboard black_bishop_moves = get_bishop_pseudo_moves(black_bishops, black, white | black);
-
-    printf("white pawns\n");
-    print_bitboard(white_pawns);
-    printf("black pawns\n");
-    print_bitboard(black_pawns);
-    printf("white knights\n");
-    print_bitboard(white_knights);
-    printf("black knights\n");
-    print_bitboard(black_knights);
-    printf("white bishops\n");
-    print_bitboard(white_bishops);
-    printf("black bishops\n");
-    print_bitboard(black_bishops);
-    printf("white pawn moves\n");
-    print_bitboard(white_pawn_moves);
-    printf("black pawn moves\n");
-    print_bitboard(black_pawn_moves);
-    printf("white knight moves\n");
-    print_bitboard(white_knight_moves);
-    printf("black knight moves\n");
-    print_bitboard(black_knight_moves);
-    printf("white bishop moves\n");
-    print_bitboard(white_bishop_moves);
-    printf("black bishop moves\n");
-    print_bitboard(black_bishop_moves);
 }

@@ -1,4 +1,5 @@
 #ifndef ALPHABETA_H
+#define ALPHABETA_H
 
 #include "chess_logic.h"
 #include "types.h"
