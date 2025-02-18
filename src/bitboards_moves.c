@@ -220,12 +220,14 @@ Bitboard get_king_pseudo_moves(Bitboard kings, Bitboard ally, Bitboard blockers,
         if ((blockers & kingside_block_mask) == 0 && (threatened_squares & kingside_threatened_mask) == 0)
             king_moves |= (kings >> 2);
     }
-    else if (queenside_castlable)
+    if (queenside_castlable)
     {
         Bitboard queenside_block_mask = color == WHITE ? 0x70 : 0x7000000000000000;
         Bitboard queenside_threatened_mask = color == WHITE ? 0x38 : 0x3800000000000000;
         if ((blockers & queenside_block_mask) == 0 && (threatened_squares & queenside_threatened_mask) == 0)
+        {
             king_moves |= (kings << 2);
+        }
     }
 
     return king_moves & ~ally;

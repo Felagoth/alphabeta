@@ -106,23 +106,9 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
         result.score = alpha_beta_score(board_history, color, is_max);
         return result;
     }
-    MoveList *move_list = possible_moves(board_history->board_s, color);
-    MoveList *move_list1 = possible_moves_bb(board_history->board_s);
-    if (move_list->size != move_list1->size)
-    {
-        if (get_targetbb_move_list(move_list) ^ get_targetbb_move_list(move_list1))
-        {
-            printf("\n\nplayer: %c\n", color);
-            printf("move_list size: %d\n", move_list->size);
-            print_bitboard(get_targetbb_move_list(move_list));
-            print_move_list(move_list);
-            printf("move_list1 size: %d\n", move_list1->size);
-            print_bitboard(get_targetbb_move_list(move_list1));
-            print_move_list(move_list1);
-            print_bitboard(get_targetbb_move_list(move_list) ^ get_targetbb_move_list(move_list1));
-            print_board_debug(board_history->board_s);
-        }
-    }
+    // MoveList *move_list = possible_moves(board_history->board_s, color);
+    MoveList *move_list = possible_moves_bb(board_history->board_s);
+    // verify_and_print_differences(move_list, move_list_bb, board_history, color);
     if (move_list == NULL)
     {
         if (is_check(board_history->board_s, color))
