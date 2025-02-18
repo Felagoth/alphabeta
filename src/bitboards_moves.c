@@ -279,11 +279,11 @@ void add_move_co(MoveList *move_list, int init_square, int dest_square, PieceTyp
 {
     if (piece_type == PAWN && (move_list->moves[move_list->size].dest_co.x == 0 || move_list->moves[move_list->size].dest_co.x == 7))
     {
-        for (Promotion p = PQUEEN; p < PNONE; p++)
+        for (int p = 0; p < 4; p++)
         {
             move_list->moves[move_list->size].init_co = get_coords(init_square);
             move_list->moves[move_list->size].dest_co = get_coords(dest_square);
-            move_list->moves[move_list->size].promotion = p;
+            move_list->moves[move_list->size].promotion = "QNBR"[p];
             move_list->size++;
         }
     }
@@ -291,7 +291,7 @@ void add_move_co(MoveList *move_list, int init_square, int dest_square, PieceTyp
     {
         move_list->moves[move_list->size].init_co = get_coords(init_square);
         move_list->moves[move_list->size].dest_co = get_coords(dest_square);
-        move_list->moves[move_list->size].promotion = PNONE;
+        move_list->moves[move_list->size].promotion = ' ';
     }
     move_list->size++;
 }
@@ -397,7 +397,7 @@ Bitboard get_piece_moves(BoardState *board_s, PieceType piece_type, bool is_chec
     return legal_moves;
 }
 
-MoveList *possible_moves(BoardState *board_s)
+MoveList *possible_moves_bb(BoardState *board_s)
 {
     bool is_check = is_king_in_check(board_s);
     MoveList *move_list = malloc(sizeof(MoveList));
@@ -457,9 +457,4 @@ void test_basics()
     print_bitboard(white_bishop_moves);
     printf("black bishop moves\n");
     print_bitboard(black_bishop_moves);
-}
-
-int main()
-{
-    return 0;
 }

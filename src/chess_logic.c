@@ -5,6 +5,7 @@
 #include "types.h"
 #include "legal_moves.h"
 #include "chess_logic.h"
+#include "bitboards_moves.h"
 
 Piece empty_piece()
 {
@@ -27,7 +28,7 @@ Move empty_move()
     Move move;
     move.init_co = empty_coords();
     move.dest_co = empty_coords();
-    move.promotion = NULL;
+    move.promotion = ' ';
     return move;
 }
 
@@ -43,7 +44,7 @@ bool is_empty_coords(Coords coords)
 
 bool is_empty_move(Move move)
 {
-    return is_empty_coords(move.init_co) && is_empty_coords(move.dest_co) && move.promotion == NULL;
+    return is_empty_coords(move.init_co) && is_empty_coords(move.dest_co) && move.promotion == ' ';
 }
 
 bool are_same_piece(Piece piece1, Piece piece2)
@@ -180,7 +181,7 @@ BoardState *move_pawn_handling(BoardState *board_s, Piece move_piece, Piece dest
     // printf("dest_piece: %c, %c\n", dest_piece.name, dest_piece.color);
     if ((move_piece.color == 'w' && new_coords.x == 7) || (move_piece.color == 'b' && new_coords.x == 0))
     {
-        board_s->board[new_coords.x][new_coords.y].name = promotion_to_char[sel_move.promotion];
+        board_s->board[new_coords.x][new_coords.y].name = sel_move.promotion;
     }
     if (move_piece.color == 'w' && new_coords.x - init_coords.x == 2)
     {
@@ -326,9 +327,9 @@ BoardState *move_piece_forced(BoardState *board_s, Move cur_move)
     // normal move
     board_s->board[new_coords.x][new_coords.y].name = move_piece.name;
     // promotion
-    if (((move_piece.color == 'w' && new_coords.x == 7) || (move_piece.color == 'b' && new_coords.x == 0)) && cur_move.promotion != PNONE)
+    if (((move_piece.color == 'w' && new_coords.x == 7) || (move_piece.color == 'b' && new_coords.x == 0)) && cur_move.promotion != ' ')
     {
-        board_s->board[new_coords.x][new_coords.y].name = promotion_to_char[cur_move.promotion];
+        board_s->board[new_coords.x][new_coords.y].name = cur_move.promotion;
     }
     // finish
     board_s->board[new_coords.x][new_coords.y].color = move_piece.color;
@@ -455,6 +456,23 @@ BoardState *init_board()
     board_s->black_pawn_passant = -1;
     board_s->white_pawn_passant = -1;
     board_s->fifty_move_rule = 0;
+
+    board_s->player = WHITE;
+    board_s->color_bb[WHITE] = init_white();
+    board_s->color_bb[BLACK] = init_black();
+    board_s->all_pieces_bb[WHITE][PAWN] = init_white_pawns();
+    board_s->all_pieces_bb[BLACK][PAWN] = init_black_pawns();
+    board_s->all_pieces_bb[WHITE][KNIGHT] = init_white_knights();
+    board_s->all_pieces_bb[BLACK][KNIGHT] = init_black_knights();
+    board_s->all_pieces_bb[WHITE][BISHOP] = init_white_bishops();
+    board_s->all_pieces_bb[BLACK][BISHOP] = init_black_bishops();
+    board_s->all_pieces_bb[WHITE][ROOK] = init_white_rooks();
+    board_s->all_pieces_bb[BLACK][ROOK] = init_black_rooks();
+    board_s->all_pieces_bb[WHITE][QUEEN] = init_white_queens();
+    board_s->all_pieces_bb[BLACK][QUEEN] = init_black_queens();
+    board_s->all_pieces_bb[WHITE][KING] = init_white_kings();
+    board_s->all_pieces_bb[BLACK][KING] = init_black_kings();
+
     return board_s;
 }
 
@@ -572,7 +590,7 @@ bool can_move(BoardState *board_s, Piece piece, Coords init_co, Coords new_co, b
         Move sel_move;
         sel_move.init_co = init_co;
         sel_move.dest_co = new_co;
-        sel_move.promotion = NULL;
+        sel_move.promotion = ' ';
         *new_board_s = *board_s;
         // printf("can_move: %c (%d, %d) -> (%d, %d)\n", piece.name, init_co.x, init_co.y, new_co.x, new_co.y);
         new_board_s = move_piece_forced(new_board_s, sel_move);

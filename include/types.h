@@ -27,18 +27,6 @@ typedef enum
     KING
 } PieceType;
 
-typedef enum
-{
-    PQUEEN,
-    PKNIGHT,
-    PBISHOP,
-    PROOK,
-    PNONE
-} Promotion;
-
-// make an array to translate promotion to char
-static const char promotion_to_char[5] = {'Q', 'N', 'B', 'R', ' '};
-
 typedef struct
 {
     char name;  // name of the piece
@@ -55,7 +43,7 @@ typedef struct
 {
     Coords init_co;
     Coords dest_co;
-    Promotion promotion;
+    char promotion;
 } Move;
 
 typedef struct

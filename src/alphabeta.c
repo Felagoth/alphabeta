@@ -44,19 +44,19 @@ MoveList *possible_moves(BoardState *board_s, char color)
                         Coords dest_co = {k, l};
                         if (can_move_heuristic(board_s, piece, init_co, dest_co, true))
                         {
-                            Move move = {init_co, dest_co, NULL};
+                            Move move = empty_move();
                             if (piece.name == 'P' && (dest_co.x == 0 || dest_co.x == 7))
                             {
-                                for (Promotion p = PQUEEN; p < PNONE; p++)
+                                for (int p = 0; p < 4; p++)
                                 {
-                                    move.promotion = p;
+                                    move.promotion = "QNBR"[p];
                                     move_list->moves[move_list->size] = move;
                                     move_list->size++;
                                 }
                             }
                             else
                             {
-                                move.promotion = PNONE;
+                                move.promotion = ' ';
                                 move_list->moves[move_list->size] = move;
                                 move_list->size++;
                             }

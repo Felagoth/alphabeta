@@ -26,29 +26,29 @@ const int PAWN_SQUARE_TABLE[8][8] = {
     {5, 10, 10, -20, -20, 10, 10, 5},
     {0, 0, 0, 0, 0, 0, 0, 0}};
 
-const int PAWN = 100;
-const int KNIGHT = 320;
-const int BISHOP = 330;
-const int ROOK = 500;
-const int QUEEN = 900;
-const int KING = 20000;
+const int PAWN_VAL = 100;
+const int KNIGHT_VAL = 320;
+const int BISHOP_VAL = 330;
+const int ROOK_VAL = 500;
+const int QUEEN_VAL = 900;
+const int KING_VAL = 20000;
 
 int piece_eval(char piece_name, int x, int y)
 {
     switch (piece_name)
     {
     case 'P':
-        return PAWN + PAWN_SQUARE_TABLE[x][y];
+        return PAWN_VAL + PAWN_SQUARE_TABLE[x][y];
     case 'N':
-        return KNIGHT;
+        return KNIGHT_VAL;
     case 'B':
-        return BISHOP;
+        return BISHOP_VAL;
     case 'R':
-        return ROOK;
+        return ROOK_VAL;
     case 'Q':
-        return QUEEN;
+        return QUEEN_VAL;
     case 'K':
-        return KING + KING_SQUARE_TABLE[x][y];
+        return KING_VAL + KING_SQUARE_TABLE[x][y];
     default:
         return 0;
     }

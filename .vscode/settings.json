@@ -3,6 +3,7 @@
         "uictypes.h": "c",
         "functional": "c",
         "types.h": "c",
-        "magic_tables.h": "c"
+        "magic_tables.h": "c",
+        "bitboards_moves.h": "c"
     }
 }
