@@ -222,6 +222,7 @@ BoardState *move_pawn_handling(BoardState *board_s, Piece move_piece, Piece dest
 
 BoardState *move_king_handling(BoardState *board_s, Piece piece, Coords init_coords, Coords new_coords)
 {
+    Color color = piece.color == 'w' ? WHITE : BLACK;
     if (piece.color == 'w')
     {
         board_s->white_kingside_castlable = false;
@@ -237,20 +238,20 @@ BoardState *move_king_handling(BoardState *board_s, Piece piece, Coords init_coo
         board_s->board[new_coords.x][5].name = 'R';
         board_s->board[new_coords.x][5].color = piece.color;
         board_s->board[new_coords.x][7] = empty_piece();
-        board_s->color_bb[piece.color] ^= 1ULL << (8 * new_coords.x);
-        board_s->color_bb[piece.color] |= 1ULL << (8 * new_coords.x + 2);
-        board_s->all_pieces_bb[piece.color][ROOK] ^= (8 * new_coords.x);
-        board_s->all_pieces_bb[piece.color][ROOK] |= (8 * new_coords.x + 2);
+        board_s->color_bb[color] ^= 1ULL << (8 * new_coords.x);
+        board_s->color_bb[color] |= 1ULL << (8 * new_coords.x + 2);
+        board_s->all_pieces_bb[color][ROOK] ^= (8 * new_coords.x);
+        board_s->all_pieces_bb[color][ROOK] |= (8 * new_coords.x + 2);
     }
     else if (new_coords.y == 2 && init_coords.y == 4)
     {
         board_s->board[new_coords.x][3].name = 'R';
         board_s->board[new_coords.x][3].color = piece.color;
         board_s->board[new_coords.x][0] = empty_piece();
-        board_s->color_bb[piece.color] ^= 1ULL << (8 * new_coords.x + 7);
-        board_s->color_bb[piece.color] |= 1ULL << (8 * new_coords.x + 4);
-        board_s->all_pieces_bb[piece.color][ROOK] ^= (8 * new_coords.x + 7);
-        board_s->all_pieces_bb[piece.color][ROOK] |= (8 * new_coords.x + 4);
+        board_s->color_bb[color] ^= 1ULL << (8 * new_coords.x + 7);
+        board_s->color_bb[color] |= 1ULL << (8 * new_coords.x + 4);
+        board_s->all_pieces_bb[color][ROOK] ^= (8 * new_coords.x + 7);
+        board_s->all_pieces_bb[color][ROOK] |= (8 * new_coords.x + 4);
     }
     return board_s;
 }
