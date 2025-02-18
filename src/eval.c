@@ -54,11 +54,8 @@ int piece_eval(char piece_name, int x, int y)
     }
 }
 
-bool eval_game_ended(PositionList *board_history, int *result)
+bool check_for_mates(BoardState *board_s, char color, int *result)
 {
-    BoardState *board_s = board_history->board_s;
-
-    // check for mates
     bool white_mate = is_mate(board_s, 'w');
     bool black_mate = is_mate(board_s, 'b');
     if (white_mate && is_check(board_s, 'w'))
@@ -73,7 +70,24 @@ bool eval_game_ended(PositionList *board_history, int *result)
     {
         *result = 0;
     }
-    else if (threefold_repetition(board_s, board_history, 0))
+    else
+    {
+        return false;
+    }
+    return true;
+}
+
+bool eval_game_ended(PositionList *board_history, int *result)
+{
+    BoardState *board_s = board_history->board_s;
+
+    // check for mates, not necessary in the way we call this function
+    // if (check_for_mates(board_s, 'w', result) || check_for_mates(board_s, 'b', result))
+    // {
+    //     return true;
+    // }
+    // else
+    if (threefold_repetition(board_s, board_history, 0))
     {
         // printf("threefold repetition\n");
         *result = 0;

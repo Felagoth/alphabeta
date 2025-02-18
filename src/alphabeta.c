@@ -109,9 +109,10 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
     // MoveList *move_list = possible_moves(board_history->board_s, color);
     MoveList *move_list = possible_moves_bb(board_history->board_s);
     // verify_and_print_differences(move_list, move_list_bb, board_history, color);
-    if (move_list == NULL)
+    if (move_list->size == 0)
     {
-        if (is_check(board_history->board_s, color))
+        // if (is_check(board_history->board_s, color))
+        if (is_king_in_check(board_history->board_s))
         {
             result.score = -MAX_SCORE;
             return result;
