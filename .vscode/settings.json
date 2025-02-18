@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "uictypes.h": "c",
-        "functional": "c"
+        "functional": "c",
+        "types.h": "c",
+        "magic_tables.h": "c"
     }
 }

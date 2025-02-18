@@ -11,6 +11,34 @@ typedef int Score;
 
 typedef uint64_t Bitboard;
 
+typedef enum
+{
+    WHITE,
+    BLACK
+} Color;
+
+typedef enum
+{
+    PAWN,
+    KNIGHT,
+    BISHOP,
+    ROOK,
+    QUEEN,
+    KING
+} PieceType;
+
+typedef enum
+{
+    PQUEEN,
+    PKNIGHT,
+    PBISHOP,
+    PROOK,
+    PNONE
+} Promotion;
+
+// make an array to translate promotion to char
+static const char promotion_to_char[5] = {'Q', 'N', 'B', 'R', ' '};
+
 typedef struct
 {
     char name;  // name of the piece
@@ -27,7 +55,7 @@ typedef struct
 {
     Coords init_co;
     Coords dest_co;
-    char *promotion;
+    Promotion promotion;
 } Move;
 
 typedef struct
@@ -37,10 +65,14 @@ typedef struct
     bool white_queenside_castlable;
     bool black_kingside_castlable;
     bool black_queenside_castlable;
-    bool game_ended;
     int black_pawn_passant; // -1 if no pawn can be taken en passant, otherwise the column of the pawn
     int white_pawn_passant;
     int fifty_move_rule;
+    Color player;
+
+    // redondance
+    Bitboard color_bb[2];
+    Bitboard all_pieces_bb[2][6];
 } BoardState;
 
 typedef struct position_list
@@ -52,7 +84,7 @@ typedef struct position_list
 typedef struct
 {
     Move moves[MAX_MOVES];
-    int count;
+    int size;
 } MoveList;
 
 #endif

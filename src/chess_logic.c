@@ -180,7 +180,7 @@ BoardState *move_pawn_handling(BoardState *board_s, Piece move_piece, Piece dest
     // printf("dest_piece: %c, %c\n", dest_piece.name, dest_piece.color);
     if ((move_piece.color == 'w' && new_coords.x == 7) || (move_piece.color == 'b' && new_coords.x == 0))
     {
-        board_s->board[new_coords.x][new_coords.y].name = *sel_move.promotion;
+        board_s->board[new_coords.x][new_coords.y].name = promotion_to_char[sel_move.promotion];
     }
     if (move_piece.color == 'w' && new_coords.x - init_coords.x == 2)
     {
@@ -326,9 +326,9 @@ BoardState *move_piece_forced(BoardState *board_s, Move cur_move)
     // normal move
     board_s->board[new_coords.x][new_coords.y].name = move_piece.name;
     // promotion
-    if (((move_piece.color == 'w' && new_coords.x == 7) || (move_piece.color == 'b' && new_coords.x == 0)) && cur_move.promotion != NULL)
+    if (((move_piece.color == 'w' && new_coords.x == 7) || (move_piece.color == 'b' && new_coords.x == 0)) && cur_move.promotion != PNONE)
     {
-        board_s->board[new_coords.x][new_coords.y].name = *cur_move.promotion;
+        board_s->board[new_coords.x][new_coords.y].name = promotion_to_char[cur_move.promotion];
     }
     // finish
     board_s->board[new_coords.x][new_coords.y].color = move_piece.color;
@@ -452,7 +452,6 @@ BoardState *init_board()
     board_s->white_queenside_castlable = true;
     board_s->black_kingside_castlable = true;
     board_s->black_queenside_castlable = true;
-    board_s->game_ended = false;
     board_s->black_pawn_passant = -1;
     board_s->white_pawn_passant = -1;
     board_s->fifty_move_rule = 0;
@@ -473,11 +472,10 @@ BoardState *FEN_to_board(char *FEN)
     {
         if (FEN[i] == '/')
         {
-            i++;
             x++;
             y = 0;
         }
-        if (FEN[i] >= '1' && FEN[i] <= '8')
+        else if (FEN[i] >= '1' && FEN[i] <= '8')
         {
             for (int k = 0; k < FEN[i] - '0'; k++)
             {
@@ -488,35 +486,56 @@ BoardState *FEN_to_board(char *FEN)
         }
         else
         {
-            board_s->board[x][i - j].name = FEN[i];
+            board_s->board[x][y].name = FEN[i];
             if (FEN[i] >= 'A' && FEN[i] <= 'Z')
             {
-                board_s->board[j][i - j].color = 'w';
+                board_s->board[x][y].color = 'w';
             }
             else
             {
-                board_s->board[j][i - j].color = 'b';
+                board_s->board[x][y].color = 'b';
             }
-            j++;
+            y++;
         }
         i++;
     }
     i++;
-    if (FEN[i] == 'w')
+    if (FEN[i] == 'w' || 'b')
     {
-        board_s->white_kingside_castlable = true;
-        board_s->white_queenside_castlable = true;
-        board_s->black_kingside_castlable = true;
-        board_s->black_queenside_castlable = true;
+        i = i + 2;
+    }
+    board_s->white_kingside_castlable = false;
+    board_s->white_queenside_castlable = false;
+    board_s->black_kingside_castlable = false;
+    board_s->black_queenside_castlable = false;
+    if (FEN[i] == '-')
+    {
+        i++;
     }
     else
     {
-        board_s->white_kingside_castlable = false;
-        board_s->white_queenside_castlable = false;
-        board_s->black_kingside_castlable = false;
-        board_s->black_queenside_castlable = false;
+        while (FEN[i] != ' ')
+        {
+            if (FEN[i] == 'K')
+            {
+                board_s->white_kingside_castlable = true;
+            }
+            else if (FEN[i] == 'Q')
+            {
+                board_s->white_queenside_castlable = true;
+            }
+            else if (FEN[i] == 'k')
+            {
+                board_s->black_kingside_castlable = true;
+            }
+            else if (FEN[i] == 'q')
+            {
+                board_s->black_queenside_castlable = true;
+            }
+            i++;
+        }
     }
-    i = i + 2;
+    i++;
     if (FEN[i] != '-')
     {
         board_s->black_pawn_passant = FEN[i] - 'a';
@@ -527,7 +546,8 @@ BoardState *FEN_to_board(char *FEN)
         board_s->black_pawn_passant = -1;
         board_s->white_pawn_passant = -1;
     }
-    board_s->fifty_move_rule = 0;
+    i = i + 2;
+    board_s->fifty_move_rule = FEN[i] - '0';
     return board_s;
 }
 

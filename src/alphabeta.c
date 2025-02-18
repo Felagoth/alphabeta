@@ -28,7 +28,7 @@ MoveList *possible_moves(BoardState *board_s, char color)
     {
         return NULL;
     }
-    move_list->count = 0;
+    move_list->size = 0;
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
@@ -47,19 +47,18 @@ MoveList *possible_moves(BoardState *board_s, char color)
                             Move move = {init_co, dest_co, NULL};
                             if (piece.name == 'P' && (dest_co.x == 0 || dest_co.x == 7))
                             {
-                                for (int m = 0; m < 4; m++)
+                                for (Promotion p = PQUEEN; p < PNONE; p++)
                                 {
-                                    char promotion = "QNBR"[m];
-                                    move.promotion = &promotion;
-                                    move_list->moves[move_list->count] = move;
-                                    move_list->count++;
+                                    move.promotion = p;
+                                    move_list->moves[move_list->size] = move;
+                                    move_list->size++;
                                 }
                             }
                             else
                             {
-                                move.promotion = NULL;
-                                move_list->moves[move_list->count] = move;
-                                move_list->count++;
+                                move.promotion = PNONE;
+                                move_list->moves[move_list->size] = move;
+                                move_list->size++;
                             }
                         }
                     }
@@ -69,6 +68,11 @@ MoveList *possible_moves(BoardState *board_s, char color)
     }
     return move_list;
 }
+
+// do an optimized version of the possible moves function using bitboards
+// board_s is the current board state
+// color is the color of the player to move
+// return the list of possible moves
 
 typedef struct
 {
@@ -128,7 +132,7 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
     if (is_max)
     {
         result.score = -MAX_SCORE;
-        for (int i = 0; i < move_list->count; i++)
+        for (int i = 0; i < move_list->size; i++)
         {
             Move new_move = move_list->moves[i];
             *new_board_s = *board_history->board_s;
@@ -159,7 +163,7 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
     else
     {
         result.score = MAX_SCORE;
-        for (int i = 0; i < move_list->count; i++)
+        for (int i = 0; i < move_list->size; i++)
         {
             Move new_move = move_list->moves[i];
             *new_board_s = *board_history->board_s;
