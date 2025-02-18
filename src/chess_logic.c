@@ -366,13 +366,13 @@ BoardState *move_piece_forced(BoardState *board_s, Move cur_move)
     }
     Piece move_piece = get_piece(board_s->board, init_coords);
     //  castling
-    if (new_coords.y == 6 && init_coords.y == 4)
+    if (move_piece.name == 'K' && new_coords.y == 6 && init_coords.y == 4)
     {
         board_s->board[new_coords.x][5].name = 'R';
         board_s->board[new_coords.x][5].color = move_piece.color;
         board_s->board[new_coords.x][7] = empty_piece();
     }
-    else if (new_coords.y == 2 && init_coords.y == 4)
+    else if (move_piece.name == 'K' && new_coords.y == 2 && init_coords.y == 4)
     {
         board_s->board[new_coords.x][3].name = 'R';
         board_s->board[new_coords.x][3].color = move_piece.color;
@@ -674,13 +674,13 @@ bool can_move(BoardState *board_s, Piece piece, Coords init_co, Coords new_co, b
     case 'P':
         return can_move_pawn(board_s, piece, init_co, new_co);
     case 'R':
-        return can_move_rook(board_s, piece, init_co, new_co);
+        return can_move_rook(board_s, init_co, new_co);
     case 'N':
-        return can_move_knight(board_s, piece, init_co, new_co);
+        return can_move_knight(board_s, init_co, new_co);
     case 'B':
-        return can_move_bishop(board_s, piece, init_co, new_co);
+        return can_move_bishop(board_s, init_co, new_co);
     case 'Q':
-        return can_move_queen(board_s, piece, init_co, new_co);
+        return can_move_queen(board_s, init_co, new_co);
     case 'K':
         return can_move_king(board_s, piece, init_co, new_co);
     default:

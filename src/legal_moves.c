@@ -57,7 +57,7 @@ bool can_move_pawn(BoardState *board_s, Piece selected_piece, Coords init_co, Co
     return false;
 }
 
-bool can_move_rook(BoardState *board_s, Piece selected_piece, Coords init_co, Coords dest_co)
+bool can_move_rook(BoardState *board_s, Coords init_co, Coords dest_co)
 {
     Piece(*board)[8] = board_s->board;
     int newx = dest_co.x;
@@ -113,7 +113,7 @@ bool can_move_rook(BoardState *board_s, Piece selected_piece, Coords init_co, Co
     return false;
 }
 
-bool can_move_knight(BoardState *board_s, Piece selected_piece, Coords init_co, Coords dest_co)
+bool can_move_knight(BoardState *board_s, Coords init_co, Coords dest_co)
 {
     int newx = dest_co.x;
     int newy = dest_co.y;
@@ -130,7 +130,7 @@ bool can_move_knight(BoardState *board_s, Piece selected_piece, Coords init_co, 
     }
     return false;
 }
-bool can_move_bishop(BoardState *board_s, Piece selected_piece, Coords init_co, Coords dest_co)
+bool can_move_bishop(BoardState *board_s, Coords init_co, Coords dest_co)
 {
     int newx = dest_co.x;
     int newy = dest_co.y;
@@ -186,9 +186,9 @@ bool can_move_bishop(BoardState *board_s, Piece selected_piece, Coords init_co, 
     return false;
 }
 
-bool can_move_queen(BoardState *board_s, Piece selected_piece, Coords init_co, Coords dest_co)
+bool can_move_queen(BoardState *board_s, Coords init_co, Coords dest_co)
 {
-    return can_move_rook(board_s, selected_piece, init_co, dest_co) || can_move_bishop(board_s, selected_piece, init_co, dest_co);
+    return can_move_rook(board_s, init_co, dest_co) || can_move_bishop(board_s, init_co, dest_co);
 }
 
 bool can_move_king(BoardState *board_s, Piece selected_piece, Coords init_co, Coords dest_co)
