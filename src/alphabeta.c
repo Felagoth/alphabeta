@@ -10,7 +10,7 @@
 #include "bitboards_moves.h"
 #include "debug_functions.h"
 
-const int MAX_SCORE = 100000;
+const int MAX_SCORE = 100050;
 
 int alpha_beta_score(PositionList *board_history, char color, int is_max)
 {
@@ -119,7 +119,7 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
         // if (is_check(board_history->board_s, color))
         if (is_king_in_check(board_history->board_s))
         {
-            result.score = is_max ? -MAX_SCORE : MAX_SCORE;
+            result.score = is_max ? -(MAX_SCORE - depth) : (MAX_SCORE - depth);
             return result;
         }
         result.score = 0;
