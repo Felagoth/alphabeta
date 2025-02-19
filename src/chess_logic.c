@@ -66,6 +66,32 @@ Coords square_to_coords(int square)
     return coords;
 }
 
+Color char_to_color(char c)
+{
+    return c == 'w' ? WHITE : BLACK;
+}
+
+PieceType char_to_piece_type(char c)
+{
+    switch (c)
+    {
+    case 'P':
+        return PAWN;
+    case 'N':
+        return KNIGHT;
+    case 'B':
+        return BISHOP;
+    case 'R':
+        return ROOK;
+    case 'Q':
+        return QUEEN;
+    case 'K':
+        return KING;
+    default:
+        return -1;
+    }
+}
+
 PositionList *empty_list()
 {
     return NULL;
@@ -279,32 +305,6 @@ BoardState *move_rook_handling(BoardState *board_s, Piece piece, Coords init_coo
         board_s->black_kingside_castlable = false;
     }
     return board_s;
-}
-
-Color char_to_color(char c)
-{
-    return c == 'w' ? WHITE : BLACK;
-}
-
-PieceType char_to_piece_type(char c)
-{
-    switch (c)
-    {
-    case 'P':
-        return PAWN;
-    case 'N':
-        return KNIGHT;
-    case 'B':
-        return BISHOP;
-    case 'R':
-        return ROOK;
-    case 'Q':
-        return QUEEN;
-    case 'K':
-        return KING;
-    default:
-        return -1;
-    }
 }
 
 BoardState *move_piece(BoardState *board_s, Move sel_move)
