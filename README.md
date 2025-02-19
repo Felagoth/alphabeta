@@ -1,5 +1,5 @@
 ==To do==
-* UCI-like interface to communicate (and the other sides of it, in a GUI or test ai framework)
+* UCI-like interface to communicate (and the other sides of it, in a GUI or test framework)
 * Transpositions !
 * Move ordering (history heuritic wtf is that)
 * Improve evaluation function of course......
