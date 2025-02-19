@@ -59,11 +59,11 @@ int main()
         */
         if (color == 'w')
         {
-            move = iterative_deepening(board_history, color, 3);
+            move = iterative_deepening(board_history, color, 20, 30.0);
         }
         else
         {
-            move = iterative_deepening(board_history, color, 2);
+            move = iterative_deepening(board_history, color, 20, 5.0);
         }
         board_s = move_piece(board_s, move);
         board_history = save_position(board_s, board_history);
