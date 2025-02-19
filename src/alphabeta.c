@@ -146,8 +146,6 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
             {
                 if (depth == 0)
                     printf("time exceeded the limit, time taken: %f\n", time_taken);
-                else
-                    result.score = MAX_SCORE;
                 break;
             }
             Move new_move = move_list->moves[i];
@@ -184,10 +182,7 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
             time_taken = ((double)(clock() - start_clk)) / CLOCKS_PER_SEC;
             if (time_taken > max_time)
             {
-                if (depth == 0)
-                    printf("time exceeded the limit, time taken: %f\n", time_taken);
-                else
-                    result.score = -MAX_SCORE;
+                result.score = -MAX_SCORE;
                 break;
             }
             Move new_move = move_list->moves[i];
