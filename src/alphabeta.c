@@ -114,7 +114,7 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
         // if (is_check(board_history->board_s, color))
         if (is_king_in_check(board_history->board_s))
         {
-            result.score = -MAX_SCORE;
+            result.score = is_max ? -MAX_SCORE : MAX_SCORE;
             return result;
         }
         result.score = 0;
@@ -218,10 +218,13 @@ Move iterative_deepening(PositionList *board_history, char color, int max_depth)
         start = clock();
         new_move_score = alphabeta(-MAX_SCORE, MAX_SCORE, 0, i, board_history, color, empty_move(), 1, 0, &nodes);
         int score = new_move_score.score;
-        move = new_move_score.move;
         end = clock();
         cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
         nps = nodes / cpu_time_used;
+        if (!is_empty_move(new_move_score.move))
+        {
+            move = new_move_score.move;
+        }
         printf("depth: %d, move: %c%c -> %c%c, score: %d, time taken: %f, nodes checked: %d, nps: %f\n", i, 'a' + move.init_co.y, '1' + move.init_co.x, 'a' + move.dest_co.y, '1' + move.dest_co.x, score, cpu_time_used, nodes, nps);
     }
     return move;

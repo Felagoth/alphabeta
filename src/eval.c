@@ -26,6 +26,46 @@ const int PAWN_SQUARE_TABLE[8][8] = {
     {5, 10, 10, -20, -20, 10, 10, 5},
     {0, 0, 0, 0, 0, 0, 0, 0}};
 
+const int KNIGHT_SQUARE_TABLE[8][8] = {
+    {-50, -40, -30, -30, -30, -30, -40, -50},
+    {-40, -20, 0, 0, 0, 0, -20, -40},
+    {-30, 0, 10, 15, 15, 10, 0, -30},
+    {-30, 5, 15, 20, 20, 15, 5, -30},
+    {-30, 0, 15, 20, 20, 15, 0, -30},
+    {-30, 5, 10, 15, 15, 10, 5, -30},
+    {-40, -20, 0, 5, 5, 0, -20, -40},
+    {-50, -40, -30, -30, -30, -30, -40, -50}};
+
+const int BISHOP_SQUARE_TABLE[8][8] = {
+    {-20, -10, -10, -10, -10, -10, -10, -20},
+    {-10, 0, 0, 0, 0, 0, 0, -10},
+    {-10, 0, 5, 10, 10, 5, 0, -10},
+    {-10, 5, 5, 10, 10, 5, 5, -10},
+    {-10, 0, 10, 10, 10, 10, 0, -10},
+    {-10, 10, 10, 10, 10, 10, 10, -10},
+    {-10, 5, 0, 0, 0, 0, 5, -10},
+    {-20, -10, -10, -10, -10, -10, -10, -20}};
+
+const int ROOK_SQUARE_TABLE[8][8] = {
+    {0, 0, 0, 0, 0, 0, 0, 0},
+    {5, 10, 10, 10, 10, 10, 10, 5},
+    {-5, 0, 0, 0, 0, 0, 0, -5},
+    {-5, 0, 0, 0, 0, 0, 0, -5},
+    {-5, 0, 0, 0, 0, 0, 0, -5},
+    {-5, 0, 0, 0, 0, 0, 0, -5},
+    {-5, 0, 0, 0, 0, 0, 0, -5},
+    {0, 0, 0, 5, 5, 0, 0, 0}};
+
+const int QUEEN_SQUARE_TABLE[8][8] = {
+    {-20, -10, -10, -5, -5, -10, -10, -20},
+    {-10, 0, 0, 0, 0, 0, 0, -10},
+    {-10, 0, 5, 5, 5, 5, 0, -10},
+    {-5, 0, 5, 5, 5, 5, 0, -5},
+    {0, 0, 5, 5, 5, 5, 0, -5},
+    {-10, 5, 5, 5, 5, 5, 0, -10},
+    {-10, 0, 5, 0, 0, 0, 0, -10},
+    {-20, -10, -10, -5, -5, -10, -10, -20}};
+
 const int PAWN_VAL = 100;
 const int KNIGHT_VAL = 320;
 const int BISHOP_VAL = 330;
@@ -33,22 +73,23 @@ const int ROOK_VAL = 500;
 const int QUEEN_VAL = 900;
 const int KING_VAL = 20000;
 
-int piece_eval(char piece_name, int x, int y)
+int piece_eval(char piece_name, int x, int y, char color)
 {
+    int x_from_color = color == 'w' ? 7 - x : x;
     switch (piece_name)
     {
     case 'P':
-        return PAWN_VAL + PAWN_SQUARE_TABLE[x][y];
+        return PAWN_VAL + PAWN_SQUARE_TABLE[x_from_color][y];
     case 'N':
-        return KNIGHT_VAL;
+        return KNIGHT_VAL + KNIGHT_SQUARE_TABLE[x_from_color][y];
     case 'B':
-        return BISHOP_VAL;
+        return BISHOP_VAL + BISHOP_SQUARE_TABLE[x_from_color][y];
     case 'R':
-        return ROOK_VAL;
+        return ROOK_VAL + ROOK_SQUARE_TABLE[x_from_color][y];
     case 'Q':
-        return QUEEN_VAL;
+        return QUEEN_VAL + QUEEN_SQUARE_TABLE[x_from_color][y];
     case 'K':
-        return KING_VAL + KING_SQUARE_TABLE[x][y];
+        return KING_VAL + KING_SQUARE_TABLE[x_from_color][y];
     default:
         return 0;
     }
@@ -119,11 +160,11 @@ int eval(PositionList *board_history)
             Piece piece = board[i][j];
             if (piece.color == 'w')
             {
-                score += piece_eval(piece.name, i, j);
+                score += piece_eval(piece.name, i, j, 'w');
             }
             else if (piece.color == 'b')
             {
-                score -= piece_eval(piece.name, i, j);
+                score -= piece_eval(piece.name, i, j, 'b');
             }
         }
     }

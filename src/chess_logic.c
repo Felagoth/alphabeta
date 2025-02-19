@@ -195,7 +195,10 @@ BoardState *move_pawn_handling(BoardState *board_s, Piece move_piece, Piece dest
     // printf("dest_piece: %c, %c\n", dest_piece.name, dest_piece.color);
     if ((move_piece.color == 'w' && new_coords.x == 7) || (move_piece.color == 'b' && new_coords.x == 0))
     {
+        Color color = move_piece.color == 'w' ? WHITE : BLACK;
         board_s->board[new_coords.x][new_coords.y].name = sel_move.promotion;
+        board_s->all_pieces_bb[color][char_to_piece_type(sel_move.promotion)] |= 1ULL << coords_to_square(new_coords);
+        board_s->all_pieces_bb[color][PAWN] &= ~(1ULL << coords_to_square(new_coords));
     }
     if (move_piece.color == 'w' && new_coords.x - init_coords.x == 2)
     {
