@@ -96,7 +96,7 @@ typedef struct
 // nodes is the number of nodes checked
 // return the score of the best move
 
-MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList *board_history, char color, Move tested_move, int is_max, int is_min, int *nodes)
+MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList *board_history, char color, Move tested_move, int is_max, int is_min, int *nodes, Move prio_move)
 {
     *nodes = *nodes + 1;
     MoveScore result;
@@ -109,6 +109,11 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
     // MoveList *move_list = possible_moves(board_history->board_s, color);
     MoveList *move_list = possible_moves_bb(board_history->board_s);
     // verify_and_print_differences(move_list, move_list_bb, board_history, color);
+    if (prio_move.init_co.x != -1)
+    {
+        move_list->moves[move_list->size] = prio_move;
+        move_list->size++;
+    }
     if (move_list->size == 0)
     {
         // if (is_check(board_history->board_s, color))
@@ -133,7 +138,7 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
     if (is_max)
     {
         result.score = -MAX_SCORE;
-        for (int i = 0; i < move_list->size; i++)
+        for (int i = move_list->size - 1; i >= 0; i--)
         {
             Move new_move = move_list->moves[i];
             *new_board_s = *board_history->board_s;
@@ -143,7 +148,7 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
             bool eval_game_ended_res = eval_game_ended(new_board_history, &new_score);
             if (!eval_game_ended_res)
             {
-                MoveScore new_move_score = alphabeta(alpha, beta, depth + 1, max_depth, new_board_history, next_color, new_move, 0, 1, nodes);
+                MoveScore new_move_score = alphabeta(alpha, beta, depth + 1, max_depth, new_board_history, next_color, new_move, 0, 1, nodes, empty_move());
                 new_score = new_move_score.score;
             }
             if (new_score > result.score)
@@ -164,7 +169,7 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
     else
     {
         result.score = MAX_SCORE;
-        for (int i = 0; i < move_list->size; i++)
+        for (int i = move_list->size - 1; i >= 0; i--)
         {
             Move new_move = move_list->moves[i];
             *new_board_s = *board_history->board_s;
@@ -174,7 +179,7 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
             bool eval_game_ended_res = eval_game_ended(new_board_history, &new_score);
             if (!eval_game_ended_res)
             {
-                MoveScore new_move_score = alphabeta(alpha, beta, depth + 1, max_depth, new_board_history, next_color, new_move, 1, 0, nodes);
+                MoveScore new_move_score = alphabeta(alpha, beta, depth + 1, max_depth, new_board_history, next_color, new_move, 1, 0, nodes, empty_move());
                 new_score = new_move_score.score;
             }
             if (new_score < result.score)
@@ -216,7 +221,7 @@ Move iterative_deepening(PositionList *board_history, char color, int max_depth)
     {
         nodes = 0;
         start = clock();
-        new_move_score = alphabeta(-MAX_SCORE, MAX_SCORE, 0, i, board_history, color, empty_move(), 1, 0, &nodes);
+        new_move_score = alphabeta(-MAX_SCORE, MAX_SCORE, 0, i, board_history, color, empty_move(), 1, 0, &nodes, move);
         int score = new_move_score.score;
         end = clock();
         cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;

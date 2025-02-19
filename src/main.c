@@ -49,7 +49,7 @@ int main()
     char color = 'w';
     print_board(board_s);
 
-    for (int i = 0; i < 200; i++)
+    for (int i = 0; i < 300; i++)
     {
         /*
         // ask for ENTER key
@@ -63,7 +63,7 @@ int main()
         }
         else
         {
-            move = iterative_deepening(board_history, color, 6);
+            move = iterative_deepening(board_history, color, 2);
         }
         board_s = move_piece(board_s, move);
         board_history = save_position(board_s, board_history);
