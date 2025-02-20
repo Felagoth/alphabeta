@@ -8,6 +8,7 @@
 
 // basic functions
 BoardState *init_board();
+BoardState *FEN_to_board(char *FEN);
 Piece empty_piece();
 Coords empty_coords();
 Move empty_move();
@@ -17,6 +18,7 @@ bool is_empty_move(Move move);
 int coords_to_square(Coords co);
 Coords square_to_coords(int square);
 PositionList *empty_list();
+void free_position_list(PositionList *pos_l);
 int pos_list_length(PositionList *pos_l);
 PositionList *save_position(BoardState *board_s, PositionList *pos_l);
 Piece get_piece(Piece board[8][8], Coords coords);

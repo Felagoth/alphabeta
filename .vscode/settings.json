@@ -4,6 +4,7 @@
         "functional": "c",
         "types.h": "c",
         "magic_tables.h": "c",
-        "bitboards_moves.h": "c"
+        "bitboards_moves.h": "c",
+        "debug_functions.h": "c"
     }
 }

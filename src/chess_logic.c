@@ -97,6 +97,16 @@ PositionList *empty_list()
     return NULL;
 }
 
+void free_position_list(PositionList *pos_l)
+{
+    if (pos_l != NULL)
+    {
+        free_position_list(pos_l->tail);
+        free(pos_l->board_s);
+        free(pos_l);
+    }
+}
+
 int pos_list_length(PositionList *pos_l)
 {
     if (pos_l == NULL)
@@ -563,34 +573,39 @@ BoardState *FEN_to_board(char *FEN)
         return NULL;
     }
     int i = 0;
-    int x = 0;
+    int xx = 0;
     int y = 0;
     while (FEN[i] != ' ')
     {
         if (FEN[i] == '/')
         {
-            x++;
+            xx++;
             y = 0;
         }
         else if (FEN[i] >= '1' && FEN[i] <= '8')
         {
             for (int k = 0; k < FEN[i] - '0'; k++)
             {
-                board_s->board[x][y].name = ' ';
-                board_s->board[x][y].color = ' ';
+                board_s->board[7 - xx][y].name = ' ';
+                board_s->board[7 - xx][y].color = ' ';
                 y++;
             }
         }
         else
         {
-            board_s->board[x][y].name = FEN[i];
             if (FEN[i] >= 'A' && FEN[i] <= 'Z')
             {
-                board_s->board[x][y].color = 'w';
+                board_s->board[7 - xx][y].color = 'w';
+                board_s->board[7 - xx][y].name = FEN[i];
+                board_s->color_bb[WHITE] |= 1ULL << (8 * (7 - xx) + 7 - y);
+                board_s->all_pieces_bb[WHITE][char_to_piece_type(FEN[i])] |= 1ULL << (8 * (7 - xx) + 7 - y);
             }
             else
             {
-                board_s->board[x][y].color = 'b';
+                board_s->board[7 - xx][y].color = 'b';
+                board_s->board[7 - xx][y].name = FEN[i] - 'a' + 'A';
+                board_s->color_bb[BLACK] |= 1ULL << (8 * xx + 7 - y);
+                board_s->all_pieces_bb[BLACK][char_to_piece_type(FEN[i] - 'a' + 'A')] |= 1ULL << (8 * (7 - xx) + 7 - y);
             }
             y++;
         }
@@ -599,6 +614,7 @@ BoardState *FEN_to_board(char *FEN)
     i++;
     if (FEN[i] == 'w' || 'b')
     {
+        board_s->player = FEN[i] == 'w' ? WHITE : BLACK;
         i = i + 2;
     }
     board_s->white_kingside_castlable = false;

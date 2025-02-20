@@ -145,7 +145,7 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
             if (time_taken > max_time)
             {
                 if (depth == 0)
-                    printf("time exceeded the limit, time taken: %f\n", time_taken);
+                    fprintf(stderr, "time exceeded the limit, time taken: %f\n", time_taken);
                 break;
             }
             Move new_move = move_list->moves[i];
@@ -245,10 +245,10 @@ Move iterative_deepening(PositionList *board_history, char color, int max_depth,
         {
             move = new_move_score.move;
         }
-        printf("depth: %d, move: %c%c -> %c%c, score: %d, time taken: %f, nodes checked: %d, nps: %f\n", i, 'a' + move.init_co.y, '1' + move.init_co.x, 'a' + move.dest_co.y, '1' + move.dest_co.x, score, cpu_time_used, nodes, nps);
+        fprintf(stderr, "depth: %d, move: %c%c -> %c%c, score: %d, time taken: %f, nodes checked: %d, nps: %f\n", i, 'a' + move.init_co.y, '1' + move.init_co.x, 'a' + move.dest_co.y, '1' + move.dest_co.x, score, cpu_time_used, nodes, nps);
         if (abs(score) >= MAX_SCORE - 50)
         {
-            printf("a mate was found\n");
+            fprintf(stderr, "a mate was found\n");
             break;
         }
         double total_time = ((double)(clock() - glob_start)) / CLOCKS_PER_SEC;

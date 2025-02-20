@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "types.h"
 #include "alphabeta.h"
 #include "chess_logic.h"
+#include "interface_uci_like.h"
+#include "debug_functions.h"
 
 void print_board(BoardState *board_s)
 {
@@ -31,16 +34,7 @@ void print_board(BoardState *board_s)
     printf("  a b c d e f g h\n");
 }
 
-void print_move(Move move)
-{
-    char start_col = 'a' + move.init_co.y;
-    char start_row = '1' + (move.init_co.x);
-    char end_col = 'a' + move.dest_co.y;
-    char end_row = '1' + (move.dest_co.x);
-    printf("%c%c -> %c%c\n", start_col, start_row, end_col, end_row);
-}
-
-int main()
+void test_self_engine(double time_white, double time_black)
 {
     PositionList *board_history = empty_list();
     BoardState *board_s = init_board();
@@ -59,11 +53,11 @@ int main()
         */
         if (color == 'w')
         {
-            move = iterative_deepening(board_history, color, 20, 30.0);
+            move = iterative_deepening(board_history, color, 20, time_white);
         }
         else
         {
-            move = iterative_deepening(board_history, color, 20, 5.0);
+            move = iterative_deepening(board_history, color, 20, time_black);
         }
         board_s = move_piece(board_s, move);
         board_history = save_position(board_s, board_history);
@@ -99,6 +93,76 @@ int main()
         }
     }
     free(board_s);
+}
 
+void test_uci_solo()
+{
+    char buffer[512] = {0};
+    PositionList *board_history = malloc(sizeof(PositionList));
+    if (board_history == NULL)
+    {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+    board_history->tail = NULL;
+    board_history->board_s = NULL;
+
+    const char *commands[] = {
+        "position startpos moves e2e4\n",
+        "go wtime 1000 btime 1000\n",
+        "position startpos moves e2e4 e7e5\n",
+        "go wtime 1000 btime 1000\n",
+        "position startpos moves e2e4 e7e5 g1f3\n",
+        "go wtime 1000 btime 1000\n",
+        "position fen \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\" moves e2e4 e7e5 g1f3 b8c6\n",
+        "go wtime 1000 btime 1000\n",
+        "position fen \"rnbqkbnr/p3pppp/2p5/3p4/8/2N5/PPPPPPPP/R1BQKBNR w KQkq - 0 1\" moves e2e4 e7e5 g1f3\n",
+        "go wtime 1000 btime 1000\n",
+        "quit\n"};
+
+    int i = 0;
+    while (strcmp(buffer, "quit\n") != 0)
+    {
+        strcpy(buffer, commands[i]);
+        fprintf(stderr, "Debug: Received message from main program:\n %s\n\n", buffer);
+        handle_uci_command(buffer, board_history);
+        i++;
+    }
+    free_position_list(board_history);
+}
+
+void answer_uci()
+{
+    char buffer[512] = {0};
+    PositionList *board_history = malloc(sizeof(PositionList));
+    if (board_history == NULL)
+    {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+    board_history->tail = NULL;
+    board_history->board_s = NULL;
+
+    while (strcmp(buffer, "quit\n") != 0)
+    {
+        if (fgets(buffer, sizeof(buffer), stdin) != NULL)
+        {
+            fprintf(stderr, "Debug: Received message from main program:\n %s\n\n", buffer);
+            handle_uci_command(buffer, board_history);
+        }
+        else
+        {
+            perror("fgets");
+            exit(EXIT_FAILURE);
+        }
+    }
+    free_position_list(board_history);
+}
+
+int main()
+{
+    // test_self_engine(5.0, 0.5);
+    test_uci_solo();
+    // answer_uci();
     return 0;
 }
