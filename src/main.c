@@ -97,7 +97,7 @@ void test_self_engine(double time_white, double time_black)
 
 void test_uci_solo()
 {
-    char buffer[512] = {0};
+    char buffer[1024] = {0};
     PositionList *board_history = malloc(sizeof(PositionList));
     if (board_history == NULL)
     {
@@ -108,16 +108,16 @@ void test_uci_solo()
     board_history->board_s = NULL;
 
     const char *commands[] = {
-        "position startpos moves e2e4\n",
-        "go wtime 1000 btime 1000\n",
-        "position startpos moves e2e4 e7e5\n",
-        "go wtime 1000 btime 1000\n",
-        "position startpos moves e2e4 e7e5 g1f3\n",
-        "go wtime 1000 btime 1000\n",
-        "position fen \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\" moves e2e4 e7e5 g1f3 b8c6\n",
-        "go wtime 1000 btime 1000\n",
         "position fen \"rnbqkbnr/p3pppp/2p5/3p4/8/2N5/PPPPPPPP/R1BQKBNR w KQkq - 0 1\" moves e2e4 e7e5 g1f3\n",
-        "go wtime 1000 btime 1000\n",
+        "go wtime 10000 btime 10000\n",
+        "position startpos moves e2e4\n",
+        "go wtime 10000 btime 10000\n",
+        "position startpos moves e2e4 d7d5\n",
+        "go wtime 10000 btime 0\n",
+        "position startpos moves e2e4 d7d5 f1b5\n",
+        "go depth 4 wtime 0 btime 10000\n",
+        "position startpos moves e2e4 d7d5 f1b5\n",
+        "go wtime 0 btime infinite depth 5\n",
         "quit\n"};
 
     int i = 0;
@@ -133,7 +133,7 @@ void test_uci_solo()
 
 void answer_uci()
 {
-    char buffer[512] = {0};
+    char buffer[1024] = {0};
     PositionList *board_history = malloc(sizeof(PositionList));
     if (board_history == NULL)
     {
@@ -147,6 +147,15 @@ void answer_uci()
     {
         if (fgets(buffer, sizeof(buffer), stdin) != NULL)
         {
+            // Check if the input was too long
+            if (strlen(buffer) == sizeof(buffer) - 1 && buffer[sizeof(buffer) - 2] != '\n')
+            {
+                fprintf(stderr, "Error: Input exceeds maximum length of 1023 characters.\n");
+                exit(EXIT_FAILURE);
+                // while (fgetc(stdin) != '\n');
+                // continue;
+            }
+
             fprintf(stderr, "Debug: Received message from main program:\n %s\n\n", buffer);
             handle_uci_command(buffer, board_history);
         }

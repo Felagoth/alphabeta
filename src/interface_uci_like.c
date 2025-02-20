@@ -46,6 +46,7 @@ PositionList *parse_moves(char *token, PositionList *board_history)
         new_board_s = move_piece(new_board_s, move);
         board_history = save_position(new_board_s, board_history);
     } while (last_char != '\n');
+    free(new_board_s);
     return board_history;
 }
 
@@ -66,8 +67,10 @@ PositionList *parse_position(char *token)
     else
     {
         fprintf(stderr, "Error: unknown position command\n");
+        exit(EXIT_FAILURE);
     }
     board_history = save_position(new_board_s, board_history);
+    free(new_board_s);
     if (token[strlen(token) - 1] == '\n')
     {
         return board_history;
@@ -93,9 +96,18 @@ double parse_time_ms(char *token)
     return atof(token) / 1000;
 }
 
+int parse_depth(char *token)
+{
+    if (token[strlen(token) - 1] == '\n')
+    {
+        token[strlen(token) - 1] = '\0';
+    }
+    return atoi(token);
+}
+
 void parse_go(char *token, PositionList *board_history)
 {
-    int depth = 30;
+    int depth = 50;
     double wtime = 0, btime = 0;
     while (token != NULL)
     {
@@ -106,7 +118,8 @@ void parse_go(char *token, PositionList *board_history)
         }
         if (strcmp(token, "depth") == 0)
         {
-            depth = atoi(strtok(NULL, " "));
+            token = strtok(NULL, " ");
+            depth = parse_depth(token);
         }
         else if (strcmp(token, "wtime") == 0)
         {
@@ -151,8 +164,9 @@ void handle_uci_command(char *command, PositionList *board_history)
     }
     else if (strncmp(token, "position", 8) == 0)
     {
-        if (board_history->tail != NULL)
-            free_position_list(board_history->tail);
+        free_position_list(board_history->tail);
+        if (board_history->board_s != NULL)
+            free(board_history->board_s);
         PositionList *new_board_history = parse_position(token);
         *board_history = *new_board_history;
         free(new_board_history);
@@ -165,7 +179,7 @@ void handle_uci_command(char *command, PositionList *board_history)
     }
     else if (strcmp(token, "quit\n") == 0)
     {
-        exit(EXIT_SUCCESS);
+        // do nothing
     }
     else if (strcmp(token, "ucinewgame\n") == 0)
     {

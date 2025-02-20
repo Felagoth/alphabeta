@@ -99,11 +99,12 @@ PositionList *empty_list()
 
 void free_position_list(PositionList *pos_l)
 {
-    if (pos_l != NULL)
+    while (pos_l != NULL)
     {
-        free_position_list(pos_l->tail);
-        free(pos_l->board_s);
-        free(pos_l);
+        PositionList *temp = pos_l;
+        pos_l = pos_l->tail;
+        free(temp->board_s);
+        free(temp);
     }
 }
 
@@ -567,7 +568,7 @@ BoardState *init_board()
 
 BoardState *FEN_to_board(char *FEN)
 {
-    BoardState *board_s = malloc(sizeof(BoardState));
+    BoardState *board_s = init_board();
     if (board_s == NULL)
     {
         return NULL;
@@ -604,7 +605,7 @@ BoardState *FEN_to_board(char *FEN)
             {
                 board_s->board[7 - xx][y].color = 'b';
                 board_s->board[7 - xx][y].name = FEN[i] - 'a' + 'A';
-                board_s->color_bb[BLACK] |= 1ULL << (8 * xx + 7 - y);
+                board_s->color_bb[BLACK] |= 1ULL << (8 * (7 - xx) + 7 - y);
                 board_s->all_pieces_bb[BLACK][char_to_piece_type(FEN[i] - 'a' + 'A')] |= 1ULL << (8 * (7 - xx) + 7 - y);
             }
             y++;

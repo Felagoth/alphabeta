@@ -67,7 +67,6 @@ Bitboard get_targetbb_move_list(MoveList *move_list)
     {
         Move move = move_list->moves[i];
         targetbb |= 1ULL << coords_to_square(move.dest_co);
-        // fprintf(stderr, "init: %d %d, dest: %d %d\n", move.init_co.x, move.init_co.y, move.dest_co.x, move.dest_co.y);
     }
     return targetbb;
 }

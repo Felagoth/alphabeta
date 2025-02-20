@@ -120,9 +120,11 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
         if (is_king_in_check(board_history->board_s))
         {
             result.score = is_max ? -(MAX_SCORE - depth) : (MAX_SCORE - depth);
+            free(move_list);
             return result;
         }
         result.score = 0;
+        free(move_list);
         return result;
     }
     BoardState *new_board_s = malloc(sizeof(BoardState));
@@ -131,6 +133,7 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
     {
         result.score = 0;
         result.move = empty_move();
+        free(move_list);
         return result;
     }
     new_board_history->tail = board_history;
