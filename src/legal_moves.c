@@ -8,7 +8,7 @@
 
 bool can_move_pawn(BoardState *board_s, Piece selected_piece, Coords init_co, Coords dest_co)
 {
-    // printf("cmp: piece is %c %c\n", selected_piece.name, selected_piece.color);
+    // fprintf(stderr, "cmp: piece is %c %c\n", selected_piece.name, selected_piece.color);
     Piece(*board)[8] = board_s->board;
     int newx = dest_co.x;
     int newy = dest_co.y;
@@ -195,7 +195,7 @@ bool can_move_king(BoardState *board_s, Piece selected_piece, Coords init_co, Co
 {
     int newx = dest_co.x;
     int newy = dest_co.y;
-    // printf("can_move_king: %c (%d, %d) -> (%d, %d) castling rights: %d %d\n", selected_piece.color, init_co.x, init_co.y, newx, newy, board_s->white_kingside_castlable, board_s->white_queenside_castlable);
+    // fprintf(stderr, "can_move_king: %c (%d, %d) -> (%d, %d) castling rights: %d %d\n", selected_piece.color, init_co.x, init_co.y, newx, newy, board_s->white_kingside_castlable, board_s->white_queenside_castlable);
 
     if (is_attacked(board_s, dest_co, selected_piece.color, false))
     {

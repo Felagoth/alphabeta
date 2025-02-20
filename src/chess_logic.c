@@ -227,8 +227,8 @@ BoardState *move_pawn_handling(BoardState *board_s, Piece move_piece, Piece dest
     Coords new_coords = sel_move.dest_co;
     Coords init_coords = sel_move.init_co;
 
-    // printf("move_pawn_handling: color: %c, init_coords: (%d, %d), new_coords: (%d, %d)\n", move_piece.color, init_coords.x, init_coords.y, new_coords.x, new_coords.y);
-    // printf("dest_piece: %c, %c\n", dest_piece.name, dest_piece.color);
+    // fprintf(stderr, "move_pawn_handling: color: %c, init_coords: (%d, %d), new_coords: (%d, %d)\n", move_piece.color, init_coords.x, init_coords.y, new_coords.x, new_coords.y);
+    // fprintf(stderr, "dest_piece: %c, %c\n", dest_piece.name, dest_piece.color);
     if ((move_piece.color == 'w' && new_coords.x == 7) || (move_piece.color == 'b' && new_coords.x == 0))
     {
         Color color = move_piece.color == 'w' ? WHITE : BLACK;
@@ -238,7 +238,7 @@ BoardState *move_pawn_handling(BoardState *board_s, Piece move_piece, Piece dest
     }
     if (move_piece.color == 'w' && new_coords.x - init_coords.x == 2)
     {
-        // printf("2 pas, color: %c, init_coords: (%d, %d), new_coords: (%d, %d)\n", move_piece.color, init_coords.x, init_coords.y, new_coords.x, new_coords.y);
+        // fprintf(stderr, "2 pas, color: %c, init_coords: (%d, %d), new_coords: (%d, %d)\n", move_piece.color, init_coords.x, init_coords.y, new_coords.x, new_coords.y);
         board_s->white_pawn_passant = new_coords.y;
     }
     else if (move_piece.color == 'b' && init_coords.x - new_coords.x == 2)
@@ -329,7 +329,7 @@ BoardState *move_piece(BoardState *board_s, Move sel_move)
     {
         return board_s;
     }
-    // printf("move_piece: color: %c, init_coords: (%d, %d), new_coords: (%d, %d)\n", move_piece.color, init_coords.x, init_coords.y, new_coords.x, new_coords.y);
+    // fprintf(stderr, "move_piece: color: %c, init_coords: (%d, %d), new_coords: (%d, %d)\n", move_piece.color, init_coords.x, init_coords.y, new_coords.x, new_coords.y);
     // update board
     board_s->white_pawn_passant = -1;
     board_s->black_pawn_passant = -1;
@@ -687,7 +687,7 @@ bool can_move(BoardState *board_s, Piece piece, Coords init_co, Coords new_co, b
         sel_move.dest_co = new_co;
         sel_move.promotion = ' ';
         *new_board_s = *board_s;
-        // printf("can_move: %c (%d, %d) -> (%d, %d)\n", piece.name, init_co.x, init_co.y, new_co.x, new_co.y);
+        // fprintf(stderr, "can_move: %c (%d, %d) -> (%d, %d)\n", piece.name, init_co.x, init_co.y, new_co.x, new_co.y);
         new_board_s = move_piece_forced(new_board_s, sel_move);
         if (is_check(new_board_s, piece.color))
         {
@@ -697,7 +697,7 @@ bool can_move(BoardState *board_s, Piece piece, Coords init_co, Coords new_co, b
         free(new_board_s);
     }
 
-    // printf("piece is %c of color %c\n", piece.name, piece.color);
+    // fprintf(stderr, "piece is %c of color %c\n", piece.name, piece.color);
     switch (piece.name)
     {
     case 'P':
