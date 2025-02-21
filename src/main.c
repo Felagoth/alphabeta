@@ -171,7 +171,7 @@ void answer_uci()
 int main()
 {
     // test_self_engine(5.0, 0.5);
-    test_uci_solo();
-    // answer_uci();
+    // test_uci_solo();
+    answer_uci();
     return 0;
 }

@@ -10,14 +10,17 @@ void print_answer(Move best_move)
     if (best_move.init_co.x == -1)
     {
         printf("bestmove (none)\n");
+        fflush(stdout);
     }
     else if (best_move.promotion != ' ')
     {
         printf("bestmove %c%c%c%c%c\n", best_move.init_co.y + 'a', best_move.init_co.x + '1', best_move.dest_co.y + 'a', best_move.dest_co.x + '1', best_move.promotion);
+        fflush(stdout);
     }
     else
     {
         printf("bestmove %c%c%c%c\n", best_move.init_co.y + 'a', best_move.init_co.x + '1', best_move.dest_co.y + 'a', best_move.dest_co.x + '1');
+        fflush(stdout);
     }
 }
 
@@ -109,6 +112,7 @@ void parse_go(char *token, PositionList *board_history)
 {
     int depth = 50;
     double wtime = 0, btime = 0;
+    double winc = 0, binc = 0;
     while (token != NULL)
     {
         token = strtok(NULL, " ");
@@ -131,11 +135,22 @@ void parse_go(char *token, PositionList *board_history)
             token = strtok(NULL, " ");
             btime = parse_time_ms(token);
         }
+        else if (strcmp(token, "winc") == 0)
+        {
+            token = strtok(NULL, " ");
+            winc = parse_time_ms(token);
+        }
+        else if (strcmp(token, "binc") == 0)
+        {
+            token = strtok(NULL, " ");
+            binc = parse_time_ms(token);
+        }
         else
         {
             fprintf(stderr, "Error: unknown go command\n");
         }
     }
+    (void)winc, (void)binc;
     double time = board_history->board_s->player == WHITE ? wtime : btime;
     if (time == 0)
         time = 0.1;
@@ -155,12 +170,16 @@ void handle_uci_command(char *command, PositionList *board_history)
     if (strcmp(token, "uci\n") == 0)
     {
         printf("id name deltabeta\n");
+        fflush(stdout);
         printf("id author Achille Correge\n");
+        fflush(stdout);
         printf("uciok\n");
+        fflush(stdout);
     }
     else if (strcmp(token, "isready\n") == 0)
     {
         printf("readyok\n");
+        fflush(stdout);
     }
     else if (strncmp(token, "position", 8) == 0)
     {
