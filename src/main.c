@@ -93,6 +93,7 @@ void test_self_engine(double time_white, double time_black)
         }
     }
     free(board_s);
+    free_position_list(board_history);
 }
 
 void test_uci_solo()
@@ -109,11 +110,13 @@ void test_uci_solo()
 
     const char *commands[] = {
         "position fen \"rnbqkbnr/p3pppp/2p5/3p4/8/2N5/PPPPPPPP/R1BQKBNR w KQkq - 0 1\" moves e2e4 e7e5 g1f3\n",
-        "go wtime 10000 btime 10000\n",
+        "go wtime 1000 btime 1000\n",
+        "position fen \"r1b2rk1/ppq1ppbp/2n2np1/2ppN3/5P2/1P2P3/PBPPB1PP/RN1Q1RK1 w - -\" moves e5c6 b7c6 d2d4 c5d4 b2d4 c6c5 d4f6 e7f6 d1d5\n",
+        "go wtime 1000 btime 1000\n",
         "position startpos moves e2e4\n",
-        "go wtime 10000 btime 10000\n",
+        "go wtime 1000 btime 1000\n",
         "position startpos moves e2e4 d7d5\n",
-        "go wtime 10000 btime 0\n",
+        "go wtime 1000 btime 0\n",
         "position startpos moves e2e4 d7d5 f1b5\n",
         "go depth 4 wtime 0 btime 10000\n",
         "position startpos moves e2e4 d7d5 f1b5\n",
@@ -143,34 +146,31 @@ void answer_uci()
     board_history->tail = NULL;
     board_history->board_s = NULL;
 
-    while (strcmp(buffer, "quit\n") != 0)
+    while (fgets(buffer, sizeof(buffer), stdin) != NULL)
     {
-        if (fgets(buffer, sizeof(buffer), stdin) != NULL)
+        // Check if the input was too long
+        if (strlen(buffer) == sizeof(buffer) - 1 && buffer[sizeof(buffer) - 2] != '\n')
         {
-            // Check if the input was too long
-            if (strlen(buffer) == sizeof(buffer) - 1 && buffer[sizeof(buffer) - 2] != '\n')
-            {
-                fprintf(stderr, "Error: Input exceeds maximum length of 1023 characters.\n");
-                exit(EXIT_FAILURE);
-                // while (fgetc(stdin) != '\n');
-                // continue;
-            }
-
-            fprintf(stderr, "Debug: Received message from main program:\n %s\n\n", buffer);
-            handle_uci_command(buffer, board_history);
-        }
-        else
-        {
-            perror("fgets");
+            fprintf(stderr, "Error: Input exceeds maximum length of 1023 characters.\n");
             exit(EXIT_FAILURE);
+            // while (fgetc(stdin) != '\n');
+            // continue;
+        }
+        fprintf(stderr, "Debug: Received message length from main program: %ld\n", strlen(buffer));
+        fprintf(stderr, "Debug: Received message from main program: %s\n", buffer);
+        handle_uci_command(buffer, board_history);
+        if (strcmp(buffer, "quit\n") == 0)
+        {
+            break;
         }
     }
+    fprintf(stderr, "Debug: 2\n");
     free_position_list(board_history);
 }
 
 int main()
 {
-    // test_self_engine(5.0, 0.5);
+    // test_self_engine(1.0, 1.0);
     // test_uci_solo();
     answer_uci();
     return 0;

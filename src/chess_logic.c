@@ -569,6 +569,14 @@ BoardState *init_board()
 BoardState *FEN_to_board(char *FEN)
 {
     BoardState *board_s = init_board();
+    // initialize all bitboards to 0
+    board_s->color_bb[WHITE] = 0;
+    board_s->color_bb[BLACK] = 0;
+    for (int i = 0; i < 6; i++)
+    {
+        board_s->all_pieces_bb[WHITE][i] = 0;
+        board_s->all_pieces_bb[BLACK][i] = 0;
+    }
     if (board_s == NULL)
     {
         return NULL;

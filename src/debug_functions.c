@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "types.h"
 #include "chess_logic.h"
+#include "debug_functions.h"
 
 void print_bitboard(Bitboard b)
 {
@@ -131,20 +132,21 @@ void print_differences(MoveList *move_list, MoveList *move_list_bb)
     }
 }
 
-void verify_and_print_differences(MoveList *move_list, MoveList *move_list_bb, PositionList *board_history, char color)
+void verify_and_print_differences(MoveList *move_list, MoveList *move_list2, PositionList *board_history, char color)
 {
-    if (!are_same_move_set(move_list, move_list_bb))
+    if (!are_same_move_set(move_list, move_list2))
     {
-        fprintf(stderr, "\n\nplayer: %c\n", color);
+        fprintf(stderr, "\n\nplayer: %c\n\n", color);
         fprintf(stderr, "move_list size: %d\n", move_list->size);
         print_bitboard(get_targetbb_move_list(move_list));
         // print_move_list(move_list);
-        fprintf(stderr, "move_list1 size: %d\n", move_list_bb->size);
-        print_bitboard(get_targetbb_move_list(move_list_bb));
+        fprintf(stderr, "move_list1 size: %d\n", move_list2->size);
+        print_bitboard(get_targetbb_move_list(move_list2));
         // print_move_list(move_list1);
-        print_differences(move_list, move_list_bb);
-        // print_bitboard(get_targetbb_move_list(move_list) ^ get_targetbb_move_list(move_list1));
-        print_board_debug(board_history->board_s);
+        print_differences(move_list, move_list2);
+        print_bitboard(get_targetbb_move_list(move_list) ^ get_targetbb_move_list(move_list2));
+        // print_board_debug(board_history->board_s);
+        print_board_state_full(board_history->board_s);
     }
 }
 

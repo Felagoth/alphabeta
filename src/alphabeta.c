@@ -106,9 +106,9 @@ MoveScore alphabeta(int alpha, int beta, int depth, int max_depth, PositionList 
         result.score = alpha_beta_score(board_history, color, is_max);
         return result;
     }
-    // MoveList *move_list = possible_moves(board_history->board_s, color);
+    // MoveList *move_list2 = possible_moves(board_history->board_s, color);
     MoveList *move_list = possible_moves_bb(board_history->board_s);
-    // verify_and_print_differences(move_list, move_list_bb, board_history, color);
+    // verify_and_print_differences(move_list, move_list2, board_history, color);
     if (prio_move.init_co.x != -1)
     {
         move_list->moves[move_list->size] = prio_move;
