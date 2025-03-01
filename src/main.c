@@ -7,6 +7,7 @@
 #include "chess_logic.h"
 #include "interface_uci_like.h"
 #include "debug_functions.h"
+#define MAX_MSG_LENGTH 32000
 
 void print_board(BoardState *board_s)
 {
@@ -98,7 +99,7 @@ void test_self_engine(double time_white, double time_black)
 
 void test_uci_solo()
 {
-    char buffer[1024] = {0};
+    char buffer[MAX_MSG_LENGTH] = {0};
     PositionList *board_history = malloc(sizeof(PositionList));
     if (board_history == NULL)
     {
@@ -136,7 +137,7 @@ void test_uci_solo()
 
 void answer_uci()
 {
-    char buffer[1024] = {0};
+    char buffer[MAX_MSG_LENGTH] = {0};
     PositionList *board_history = malloc(sizeof(PositionList));
     if (board_history == NULL)
     {

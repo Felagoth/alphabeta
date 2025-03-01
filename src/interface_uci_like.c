@@ -152,12 +152,12 @@ void parse_go(char *token, PositionList *board_history)
     }
     (void)winc, (void)binc;
     double time = board_history->board_s->player == WHITE ? wtime : btime;
-    if (time < 0.2)
-        time = 0.1;
+    if (time < 0.01)
+        time = 0.005;
     else if (time == -1)
         time = 3600000;
     else
-        time = time - 0.1;
+        time = time - 0.005;
     char color = board_history->board_s->player == WHITE ? 'w' : 'b';
     Move best_move = iterative_deepening(board_history, color, depth, time);
     print_answer(best_move);

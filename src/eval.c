@@ -131,11 +131,15 @@ bool eval_game_ended(PositionList *board_history, int *result)
     if (threefold_repetition(board_s, board_history, 0))
     {
         // printf("threefold repetition\n");
-        *result = -200;
+        *result = -100;
     }
     else if (board_s->fifty_move_rule >= 100)
     {
-        *result = -200;
+        *result = -50;
+    }
+    else if (insufficient_material(board_s))
+    {
+        *result = 0;
     }
     else
     {

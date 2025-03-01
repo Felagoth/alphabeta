@@ -255,6 +255,11 @@ Move iterative_deepening(PositionList *board_history, char color, int max_depth,
             break;
         }
         double total_time = ((double)(clock() - glob_start)) / CLOCKS_PER_SEC;
+        if (score < -1000 && (total_time > max_time || i >= max_depth))
+        {
+            fprintf(stderr, "surrendering\n");
+            return empty_move();
+        }
         if (total_time > max_time)
         {
             break;

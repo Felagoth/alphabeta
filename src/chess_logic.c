@@ -176,6 +176,31 @@ bool threefold_repetition(BoardState *board_s, PositionList *pos_l, int number_o
     }
 }
 
+bool insufficient_material(BoardState *board_s)
+{
+    int white_pieces = __builtin_popcountll(board_s->color_bb[WHITE]);
+    int black_pieces = __builtin_popcountll(board_s->color_bb[BLACK]);
+    int white_bishops_knight = __builtin_popcountll(board_s->all_pieces_bb[WHITE][BISHOP]) + __builtin_popcountll(board_s->all_pieces_bb[WHITE][KNIGHT]);
+    int black_bishops_knight = __builtin_popcountll(board_s->all_pieces_bb[BLACK][BISHOP]) + __builtin_popcountll(board_s->all_pieces_bb[BLACK][KNIGHT]);
+    if (white_pieces == 1 && black_pieces == 1)
+    {
+        return true;
+    }
+    else if (white_pieces == 2 && black_pieces == 1 && white_bishops_knight == 1)
+    {
+        return true;
+    }
+    else if (white_pieces == 1 && black_pieces == 2 && black_bishops_knight == 1)
+    {
+        return true;
+    }
+    else if (white_pieces == 2 && black_pieces == 2 && white_bishops_knight == 1 && black_bishops_knight == 1)
+    {
+        return true;
+    }
+    return false;
+}
+
 Piece get_piece(Piece board[8][8], Coords coords)
 {
     if (is_empty_coords(coords))
